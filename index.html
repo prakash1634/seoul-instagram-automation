@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Seoul AI Fashion Marketing</title>
+<style>
+:root{--bg:#faf7f5;--card:#fff;--ink:#171515;--muted:#766d6d;--pink:#e8b4b8;--line:#eadfdf}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,sans-serif}
+header{padding:22px 28px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;background:#fff;position:sticky;top:0;z-index:2}
+.logo{font-weight:800;letter-spacing:.5px}.pill{font-size:12px;padding:7px 10px;border-radius:99px;background:#f3eeee}
+main{max-width:1200px;margin:auto;padding:28px;display:grid;gap:20px}
+.hero{display:grid;grid-template-columns:1.5fr .8fr;gap:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 8px 30px #00000008}
+h1{font-size:36px;margin:5px 0 10px}h2{font-size:20px;margin:0 0 14px}.muted{color:var(--muted)}
+textarea{width:100%;min-height:125px;border:1px solid var(--line);border-radius:14px;padding:14px;font-size:15px;resize:vertical}
+button{border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
+.primary{background:var(--ink);color:white}.accent{background:var(--pink);color:var(--ink)}.ghost{background:#f4eeee}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.role{padding:16px;border:1px solid var(--line);border-radius:15px}.role b{display:block;margin-bottom:6px}
+.pipeline{display:flex;gap:8px;flex-wrap:wrap}.step{padding:10px 12px;background:#f7f0f0;border-radius:10px;font-size:13px}
+#status{font-weight:700}.ok{color:#18794e}.warn{color:#9b5b00}
+@media(max-width:800px){.hero,.grid{grid-template-columns:1fr}h1{font-size:28px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">SEOUL AI FASHION</div>
+  <div><span id="status" class="pill">Instagram: Not connected</span> <button class="primary" onclick="connectIG()">Connect Instagram</button></div>
+</header>
+
+<main>
+<section class="hero">
+  <div class="card">
+    <div class="muted">AI Fashion Marketing Studio</div>
+    <h1>One dashboard for your Seoul/Korean fashion content.</h1>
+    <p class="muted">Create the plan for image → angles → reel → caption → Instagram publishing.</p>
+    <textarea id="prompt">Luxury Korean Seoul fashion designer editorial, elegant modern outfit, premium studio lighting, realistic fabric, full body, 9:16</textarea>
+    <div class="actions">
+      <button class="accent" onclick="makePlan()">Create 6-Angle Campaign</button>
+      <button class="ghost" onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})">Marketing Team</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2>One-click pipeline</h2>
+    <div class="pipeline">
+      <span class="step">AI Photo</span><span>→</span><span class="step">6 Angles</span><span>→</span><span class="step">10s Reel</span><span>→</span><span class="step">Caption</span><span>→</span><span class="step">Publish</span>
+    </div>
+    <hr style="border:0;border-top:1px solid var(--line);margin:20px 0">
+    <button class="primary" style="width:100%" onclick="startMarketing()">🚀 START INSTAGRAM MARKETING</button>
+    <p id="result" class="muted"></p>
+  </div>
+</section>
+
+<section class="card">
+  <h2>AI Fashion Studio</h2>
+  <div class="grid">
+    <div class="role"><b>Text → Fashion Photo</b><span class="muted">Generate the hero concept from your prompt.</span></div>
+    <div class="role"><b>Korean / Seoul Style</b><span class="muted">Keep a premium Korean editorial direction.</span></div>
+    <div class="role"><b>6 Controlled Angles</b><span class="muted">Front, 3/4, side, back and detail views.</span></div>
+    <div class="role"><b>Image Edit</b><span class="muted">Prepare variations while preserving the outfit.</span></div>
+    <div class="role"><b>Photo → 10s Reel</b><span class="muted">Prepare a short fashion video workflow.</span></div>
+    <div class="role"><b>Caption + Hashtags</b><span class="muted">Prepare Instagram-ready marketing copy.</span></div>
+  </div>
+</section>
+
+<section class="card">
+<h2>Instagram connection</h2>
+<p class="muted">The button above starts the real Meta/Instagram OAuth flow after you configure the developer app. No password is stored by this website.</p>
+<div class="actions"><button class="ghost" onclick="disconnect()">Disconnect</button></div>
+</section>
+
+<section class="card">
+<h2>Marketing Team</h2>
+<div class="grid">
+<div class="role"><b>Social Media Manager</b>Account strategy & publishing</div>
+<div class="role"><b>Content Creator</b>Fashion content production</div>
+<div class="role"><b>Video Editor</b>Reels & short clips</div>
+<div class="role"><b>Graphic Designer</b>Creative assets</div>
+<div class="role"><b>Copywriter</b>Captions & campaigns</div>
+<div class="role"><b>Community Manager</b>Comments & messages</div>
+<div class="role"><b>Ads Manager</b>Paid campaigns</div>
+<div class="role"><b>SEO / Analytics</b>Performance tracking</div>
+<div class="role"><b>Manager</b>Approvals & workflow</div>
+</div>
+</section>
+</main>
+
+<script>
+function connectIG(){ location.href="/auth/instagram"; }
+async function disconnect(){
+  const sessionId=localStorage.getItem("ig_session");
+  await fetch("/api/disconnect",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId})});
+  localStorage.removeItem("ig_session"); updateStatus();
+}
+async function updateStatus(){
+  const q=new URLSearchParams(location.search);
+  const s=document.getElementById("status");
+  if(q.get("connected")){s.textContent="Instagram: Connected ✓";s.className="pill ok";}
+  else {const r=await fetch("/api/status");const d=await r.json();s.textContent=d.connected?"Instagram: Connected ✓":"Instagram: Not connected";s.className="pill "+(d.connected?"ok":"warn");}
+}
+async function makePlan(){
+  const prompt=document.getElementById("prompt").value;
+  const r=await fetch("/api/generate-plan",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt,angles:6})});
+  const d=await r.json();
+  document.getElementById("result").textContent="Campaign ready: "+d.steps.join(" → ");
+}
+async function startMarketing(){
+  await makePlan();
+  document.getElementById("result").textContent="Campaign workflow prepared. Connect Instagram to enable the real publishing step.";
+}
+updateStatus();
+</script>
+</body>
+</html>
