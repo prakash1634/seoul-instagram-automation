@@ -8,11 +8,19 @@ const app = express();
 
 app.use(express.json({ limit: "20mb" }));
 
+// ===============================
+// FRONTEND
+// ===============================
+
 app.get("/", (req, res) => {
   res.sendFile(process.cwd() + "/index.html");
 });
 
 app.use(express.static(process.cwd()));
+
+// ===============================
+// SERVER CONFIG
+// ===============================
 
 const PORT = process.env.PORT || 3000;
 
@@ -30,8 +38,16 @@ const GRAPH_VERSION =
 const GRAPH_BASE =
   `https://graph.instagram.com/${GRAPH_VERSION}`;
 
+// ===============================
+// TEMPORARY SESSION STORAGE
+// ===============================
+
 const sessions = new Map();
 const oauthStates = new Map();
+
+// ===============================
+// HELPERS
+// ===============================
 
 function requireEnv(name) {
   if (
@@ -44,19 +60,19 @@ function requireEnv(name) {
   }
 }
 
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (char) => ({
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
     '"': "&quot;",
     "'": "&#39;"
-  }[c]));
+  }[char]));
 }
 
-/* --------------------------------
-   BASIC STATUS
--------------------------------- */
+// ===============================
+// BASIC STATUS
+// ===============================
 
 app.get("/api/status", async (req, res) => {
   const configured =
@@ -71,18 +87,20 @@ app.get("/api/status", async (req, res) => {
   });
 });
 
-
-/* --------------------------------
-   VERIFY INSTAGRAM TOKEN
--------------------------------- */
+// ===============================
+// INSTAGRAM ACCOUNT STATUS
+// ===============================
 
 app.get("/api/instagram/status", async (req, res) => {
   try {
     requireEnv("INSTAGRAM_ACCESS_TOKEN");
     requireEnv("INSTAGRAM_USER_ID");
 
-    const token = process.env.INSTAGRAM_ACCESS_TOKEN;
-    const userId = process.env.INSTAGRAM_USER_ID;
+    const token =
+      process.env.INSTAGRAM_ACCESS_TOKEN;
+
+    const userId =
+      process.env.INSTAGRAM_USER_ID;
 
     const url =
       `${GRAPH_BASE}/${userId}` +
@@ -90,6 +108,7 @@ app.get("/api/instagram/status", async (req, res) => {
       `&access_token=${encodeURIComponent(token)}`;
 
     const response = await fetch(url);
+
     const data = await response.json();
 
     if (!response.ok) {
@@ -115,18 +134,16 @@ app.get("/api/instagram/status", async (req, res) => {
   }
 });
 
-
-/* --------------------------------
-   INSTAGRAM LOGIN
--------------------------------- */
+// ===============================
+// INSTAGRAM OAUTH START
+// ===============================
 
 app.get("/auth/instagram", (req, res) => {
   try {
     requireEnv("META_APP_ID");
 
-    const state = crypto
-      .randomBytes(24)
-      .toString("hex");
+    const state =
+      crypto.randomBytes(24).toString("hex");
 
     oauthStates.set(state, Date.now());
 
@@ -165,18 +182,17 @@ app.get("/auth/instagram", (req, res) => {
 
     res.redirect(url.toString());
 
-  } catch (e) {
+  } catch (error) {
     res.status(500).send(`
       <h2>Meta setup required</h2>
-      <p>${escapeHtml(e.message)}</p>
+      <p>${escapeHtml(error.message)}</p>
     `);
   }
 });
 
-
-/* --------------------------------
-   INSTAGRAM OAUTH CALLBACK
--------------------------------- */
+// ===============================
+// INSTAGRAM OAUTH CALLBACK
+// ===============================
 
 app.get(
   "/auth/instagram/callback",
@@ -218,27 +234,40 @@ app.get(
       requireEnv("META_APP_ID");
       requireEnv("META_APP_SECRET");
 
-      const body = new URLSearchParams({
-        client_id: process.env.META_APP_ID,
-        client_secret: process.env.META_APP_SECRET,
-        grant_type: "authorization_code",
-        redirect_uri: REDIRECT,
-        code
-      });
+      const body =
+        new URLSearchParams({
+          client_id:
+            process.env.META_APP_ID,
 
-      const response = await fetch(
-        "https://api.instagram.com/oauth/access_token",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/x-www-form-urlencoded"
-          },
-          body
-        }
-      );
+          client_secret:
+            process.env.META_APP_SECRET,
 
-      const data = await response.json();
+          grant_type:
+            "authorization_code",
+
+          redirect_uri:
+            REDIRECT,
+
+          code
+        });
+
+      const response =
+        await fetch(
+          "https://api.instagram.com/oauth/access_token",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/x-www-form-urlencoded"
+            },
+
+            body
+          }
+        );
+
+      const data =
+        await response.json();
 
       if (
         !response.ok ||
@@ -256,9 +285,14 @@ app.get(
         crypto.randomBytes(24).toString("hex");
 
       sessions.set(sessionId, {
-        access_token: data.access_token,
-        user_id: data.user_id,
-        created_at: Date.now()
+        access_token:
+          data.access_token,
+
+        user_id:
+          data.user_id,
+
+        created_at:
+          Date.now()
       });
 
       res.send(`
@@ -267,30 +301,33 @@ app.get(
             "ig_session",
             "${sessionId}"
           );
+
           location.href="/?connected=1";
         </script>
       `);
 
-    } catch (e) {
+    } catch (error) {
       res.status(500).send(`
         <h2>Connection error</h2>
-        <pre>${escapeHtml(e.message)}</pre>
+        <pre>${escapeHtml(
+          error.message
+        )}</pre>
       `);
     }
   }
 );
 
-
-/* --------------------------------
-   DISCONNECT
--------------------------------- */
+// ===============================
+// DISCONNECT
+// ===============================
 
 app.post("/api/disconnect", (req, res) => {
 
-  const sid = req.body.sessionId;
+  const sessionId =
+    req.body?.sessionId;
 
-  if (sid) {
-    sessions.delete(sid);
+  if (sessionId) {
+    sessions.delete(sessionId);
   }
 
   res.json({
@@ -298,10 +335,9 @@ app.post("/api/disconnect", (req, res) => {
   });
 });
 
-
-/* --------------------------------
-   GENERATE PLAN
--------------------------------- */
+// ===============================
+// CAMPAIGN PLAN
+// ===============================
 
 app.post("/api/generate-plan", (req, res) => {
 
@@ -329,10 +365,9 @@ app.post("/api/generate-plan", (req, res) => {
   });
 });
 
-
-/* --------------------------------
-   PUBLISH IMAGE TO INSTAGRAM
--------------------------------- */
+// ===============================
+// PUBLISH IMAGE TO INSTAGRAM
+// ===============================
 
 app.post(
   "/api/publish-image",
@@ -367,10 +402,9 @@ app.post(
       const userId =
         process.env.INSTAGRAM_USER_ID;
 
-      /*
-       * Step 1:
-       * Create Instagram media container
-       */
+      // ---------------------------
+      // CREATE MEDIA CONTAINER
+      // ---------------------------
 
       const createUrl =
         `${GRAPH_BASE}/${userId}/media`;
@@ -394,14 +428,19 @@ app.post(
       );
 
       const createResponse =
-        await fetch(createUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/x-www-form-urlencoded"
-          },
-          body: createBody
-        });
+        await fetch(
+          createUrl,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/x-www-form-urlencoded"
+            },
+
+            body: createBody
+          }
+        );
 
       const createData =
         await createResponse.json();
@@ -410,7 +449,6 @@ app.post(
         !createResponse.ok ||
         !createData.id
       ) {
-
         return res.status(400).json({
           ok: false,
           step: "create_media",
@@ -421,10 +459,9 @@ app.post(
       const containerId =
         createData.id;
 
-      /*
-       * Step 2:
-       * Publish media container
-       */
+      // ---------------------------
+      // PUBLISH MEDIA
+      // ---------------------------
 
       const publishUrl =
         `${GRAPH_BASE}/${userId}/media_publish`;
@@ -443,33 +480,43 @@ app.post(
       );
 
       const publishResponse =
-        await fetch(publishUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/x-www-form-urlencoded"
-          },
-          body: publishBody
-        });
+        await fetch(
+          publishUrl,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/x-www-form-urlencoded"
+            },
+
+            body: publishBody
+          }
+        );
 
       const publishData =
         await publishResponse.json();
 
       if (!publishResponse.ok) {
-
         return res.status(400).json({
           ok: false,
           step: "publish_media",
-          container_id: containerId,
-          error: publishData
+          container_id:
+            containerId,
+          error:
+            publishData
         });
       }
 
       res.json({
         ok: true,
+
         message:
           "Instagram post published successfully.",
-        container_id: containerId,
+
+        container_id:
+          containerId,
+
         media_id:
           publishData.id
       });
@@ -478,17 +525,17 @@ app.post(
 
       res.status(500).json({
         ok: false,
-        error: error.message
+        error:
+          error.message
       });
 
     }
   }
 );
 
-
-/* --------------------------------
-   PUBLISH REEL / VIDEO
--------------------------------- */
+// ===============================
+// CREATE INSTAGRAM REEL
+// ===============================
 
 app.post(
   "/api/publish-reel",
@@ -523,10 +570,6 @@ app.post(
       const userId =
         process.env.INSTAGRAM_USER_ID;
 
-      /*
-       * Create Reel container
-       */
-
       const createUrl =
         `${GRAPH_BASE}/${userId}/media`;
 
@@ -554,14 +597,19 @@ app.post(
       );
 
       const response =
-        await fetch(createUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/x-www-form-urlencoded"
-          },
-          body
-        });
+        await fetch(
+          createUrl,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/x-www-form-urlencoded"
+            },
+
+            body
+          }
+        );
 
       const data =
         await response.json();
@@ -570,7 +618,6 @@ app.post(
         !response.ok ||
         !data.id
       ) {
-
         return res.status(400).json({
           ok: false,
           step: "create_reel",
@@ -580,66 +627,59 @@ app.post(
 
       res.json({
         ok: true,
+
         message:
           "Reel container created.",
-        container_id: data.id,
+
+        container_id:
+          data.id,
 
         note:
-          "The container must finish processing before publishing."
+          "The Reel must finish processing before final publication."
       });
 
     } catch (error) {
 
       res.status(500).json({
         ok: false,
-        error: error.message
+        error:
+          error.message
       });
 
     }
   }
 );
 
-
-/* --------------------------------
-   OLD PLACEHOLDER ROUTE
--------------------------------- */
+// ===============================
+// OLD PLACEHOLDER ENDPOINT
+// ===============================
 
 app.post(
   "/api/publish-placeholder",
   async (req, res) => {
 
-    /*
-     * Keep compatibility with the
-     * existing dashboard.
-     *
-     * If image_url is supplied,
-     * publish it to Instagram.
-     */
-
     if (req.body?.image_url) {
 
-      req.url =
-        "/api/publish-image";
+      return res.status(400).json({
+        ok: false,
 
-      return app._router.handle(
-        req,
-        res,
-        () => {}
-      );
+        message:
+          "Use /api/publish-image for Instagram image publishing."
+      });
     }
 
     res.status(400).json({
       ok: false,
+
       message:
         "Instagram publishing requires a public image_url and caption."
     });
   }
 );
 
-
-/* --------------------------------
-   SERVER
--------------------------------- */
+// ===============================
+// START SERVER
+// ===============================
 
 app.listen(
   PORT,
