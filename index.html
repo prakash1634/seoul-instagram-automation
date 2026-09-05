@@ -3,232 +3,480 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#111111">
 <title>Seoul AI Fashion Marketing</title>
 
 <style>
+:root{
+  --black:#111111;
+  --pink:#E8B4B8;
+  --cream:#FAF7F5;
+  --white:#ffffff;
+  --border:#eadfdd;
+  --muted:#777;
+  --success:#24a148;
+  --danger:#d32f2f;
+  --shadow:0 8px 28px rgba(17,17,17,.07);
+}
+
 *{
   box-sizing:border-box;
   margin:0;
   padding:0;
 }
 
+html{
+  scroll-behavior:smooth;
+}
+
 body{
   font-family:Arial,Helvetica,sans-serif;
-  background:#FAF7F5;
-  color:#111;
+  background:var(--cream);
+  color:var(--black);
+  line-height:1.5;
 }
 
-header{
-  background:#111;
-  color:white;
-  padding:18px 20px;
-  position:sticky;
-  top:0;
-  z-index:20;
-  box-shadow:0 4px 18px rgba(0,0,0,.15);
-}
-
-.header-inner{
-  max-width:1200px;
-  margin:auto;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:15px;
-}
-
-.logo{
-  font-size:20px;
-  font-weight:800;
-  letter-spacing:.4px;
-}
-
-.logo span{
-  color:#E8B4B8;
-}
-
-.status{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  font-size:13px;
-}
-
-.dot{
-  width:9px;
-  height:9px;
-  border-radius:50%;
-  background:#aaa;
-}
-
-.dot.online{
-  background:#35c759;
-  box-shadow:0 0 8px #35c759;
+button,
+input,
+textarea,
+select{
+  font:inherit;
 }
 
 button{
-  border:0;
   cursor:pointer;
-  font-weight:700;
-  border-radius:10px;
-  padding:12px 16px;
-  font-size:14px;
+}
+
+button:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+}
+
+/* HEADER */
+
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:100;
+  background:rgba(17,17,17,.97);
+  color:#fff;
+  box-shadow:0 5px 20px rgba(0,0,0,.15);
+}
+
+.topbar-inner{
+  max-width:1250px;
+  margin:auto;
+  min-height:70px;
+  padding:12px 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.brand-icon{
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  background:var(--pink);
+  display:grid;
+  place-items:center;
+  color:#111;
+  font-weight:900;
+}
+
+.brand-title{
+  font-size:18px;
+  font-weight:900;
+}
+
+.brand-sub{
+  font-size:11px;
+  color:#aaa;
+}
+
+.connection{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+.connection-dot{
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  background:#888;
+}
+
+.connection-dot.online{
+  background:#34c759;
+  box-shadow:0 0 9px #34c759;
+}
+
+.connection-text{
+  font-size:12px;
+  color:#ddd;
+}
+
+.btn{
+  border:0;
+  border-radius:11px;
+  padding:11px 15px;
+  font-weight:800;
+  transition:.18s;
+}
+
+.btn:hover{
+  transform:translateY(-1px);
+}
+
+.btn-pink{
+  background:var(--pink);
+  color:#111;
 }
 
 .btn-dark{
   background:#111;
-  color:white;
+  color:#fff;
 }
 
-.btn-pink{
-  background:#E8B4B8;
-  color:#111;
-}
-
-.btn-light{
-  background:white;
+.btn-white{
+  background:#fff;
   color:#111;
   border:1px solid #ddd;
 }
 
-.btn-danger{
-  background:#222;
-  color:white;
+.btn-outline{
+  background:transparent;
+  color:#111;
+  border:1px solid #ccc;
 }
 
-button:disabled{
-  opacity:.5;
-  cursor:not-allowed;
+.btn-danger{
+  background:#f2d7d7;
+  color:#8b1e1e;
+}
+
+/* LAYOUT */
+
+.container{
+  width:min(1250px,calc(100% - 28px));
+  margin:auto;
 }
 
 main{
-  max-width:1200px;
-  margin:auto;
-  padding:25px 18px 60px;
+  padding:24px 0 55px;
 }
+
+/* HERO */
 
 .hero{
-  background:linear-gradient(135deg,#111,#292020);
-  color:white;
-  border-radius:22px;
-  padding:30px;
-  margin-bottom:22px;
-}
-
-.hero h1{
-  font-size:32px;
-  line-height:1.15;
-  margin-bottom:10px;
-}
-
-.hero p{
-  color:#ddd;
-  max-width:700px;
-  line-height:1.6;
+  background:
+    radial-gradient(circle at 90% 10%,rgba(232,180,184,.30),transparent 28%),
+    linear-gradient(135deg,#111,#292020);
+  color:#fff;
+  border-radius:24px;
+  padding:32px;
+  box-shadow:var(--shadow);
+  margin-bottom:20px;
 }
 
 .hero-badge{
   display:inline-block;
-  background:#E8B4B8;
-  color:#111;
-  padding:7px 12px;
+  padding:7px 11px;
   border-radius:30px;
-  font-size:12px;
-  font-weight:800;
-  margin-bottom:15px;
+  background:var(--pink);
+  color:#111;
+  font-size:11px;
+  font-weight:900;
+  margin-bottom:13px;
 }
 
-.grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:16px;
-  margin-bottom:20px;
+.hero h1{
+  font-size:36px;
+  line-height:1.12;
+  margin-bottom:12px;
 }
 
-.card{
-  background:white;
-  border:1px solid #eadfdd;
-  border-radius:18px;
-  padding:20px;
-  box-shadow:0 5px 20px rgba(0,0,0,.04);
+.hero p{
+  max-width:760px;
+  color:#ddd;
+  font-size:15px;
 }
 
-.card h2,
-.card h3{
-  margin-bottom:10px;
-}
-
-.card p{
-  color:#666;
-  line-height:1.5;
-}
-
-.full{
-  grid-column:1/-1;
-}
-
-label{
-  display:block;
-  font-size:13px;
-  font-weight:700;
-  margin:13px 0 7px;
-}
-
-textarea,
-input,
-select{
-  width:100%;
-  border:1px solid #ddd;
-  border-radius:10px;
-  padding:12px;
-  font-family:inherit;
-  font-size:14px;
-  outline:none;
-  background:#fff;
-}
-
-textarea{
-  min-height:120px;
-  resize:vertical;
-}
-
-textarea:focus,
-input:focus,
-select:focus{
-  border-color:#E8B4B8;
-  box-shadow:0 0 0 3px rgba(232,180,184,.18);
-}
-
-.actions{
+.hero-actions{
   display:flex;
   flex-wrap:wrap;
   gap:10px;
-  margin-top:15px;
+  margin-top:20px;
 }
+
+/* METRICS */
 
 .metrics{
   display:grid;
-  grid-template-columns:repeat(4,1fr);
+  grid-template-columns:repeat(5,1fr);
   gap:12px;
   margin-bottom:20px;
 }
 
 .metric{
-  background:white;
-  border:1px solid #eadfdd;
-  border-radius:15px;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:17px;
   padding:17px;
+  box-shadow:var(--shadow);
 }
 
-.metric small{
-  color:#777;
+.metric-label{
+  font-size:11px;
+  color:var(--muted);
+  font-weight:700;
 }
 
-.metric strong{
+.metric-value{
+  font-size:23px;
+  font-weight:900;
+  margin-top:4px;
+}
+
+/* CARDS */
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
+  margin-bottom:16px;
+}
+
+.card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:19px;
+  padding:20px;
+  box-shadow:var(--shadow);
+}
+
+.card.full{
+  grid-column:1/-1;
+}
+
+.card-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+  margin-bottom:8px;
+}
+
+.card h2{
+  font-size:20px;
+}
+
+.card h3{
+  font-size:17px;
+}
+
+.muted{
+  color:var(--muted);
+  font-size:13px;
+}
+
+/* FORM */
+
+label{
   display:block;
-  font-size:25px;
-  margin-top:5px;
+  font-size:12px;
+  font-weight:900;
+  margin:15px 0 7px;
 }
+
+input,
+textarea,
+select{
+  width:100%;
+  border:1px solid #ddd;
+  background:#fff;
+  color:#111;
+  border-radius:11px;
+  padding:12px;
+  outline:none;
+}
+
+input:focus,
+textarea:focus,
+select:focus{
+  border-color:var(--pink);
+  box-shadow:0 0 0 3px rgba(232,180,184,.18);
+}
+
+textarea{
+  min-height:125px;
+  resize:vertical;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:14px;
+}
+
+/* PROMPT PRESETS */
+
+.presets{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:9px;
+}
+
+.preset{
+  border:1px solid var(--border);
+  background:var(--cream);
+  border-radius:30px;
+  padding:8px 11px;
+  font-size:11px;
+  font-weight:800;
+}
+
+/* STEPS */
+
+.workflow{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:8px;
+  margin-top:18px;
+}
+
+.workflow-step{
+  border:1px solid var(--border);
+  background:var(--cream);
+  border-radius:12px;
+  padding:12px 7px;
+  text-align:center;
+  font-size:11px;
+  font-weight:800;
+}
+
+.workflow-step.active{
+  background:var(--pink);
+  border-color:var(--pink);
+}
+
+.workflow-step.done{
+  background:#e8f5e9;
+  border-color:#b8dfba;
+}
+
+/* RESULT */
+
+.result{
+  display:none;
+  margin-top:14px;
+  padding:14px;
+  background:#111;
+  color:#fff;
+  border-radius:12px;
+  font-size:12px;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+
+.result.show{
+  display:block;
+}
+
+.result.success{
+  background:#16351d;
+}
+
+.result.error{
+  background:#421818;
+}
+
+/* PREVIEW */
+
+.instagram-preview{
+  max-width:430px;
+  margin:15px auto 0;
+  border:1px solid #ddd;
+  border-radius:16px;
+  overflow:hidden;
+  background:#fff;
+}
+
+.preview-head{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:11px;
+  border-bottom:1px solid #eee;
+}
+
+.avatar{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  background:var(--pink);
+  display:grid;
+  place-items:center;
+  font-weight:900;
+}
+
+.preview-name{
+  font-weight:900;
+  font-size:12px;
+}
+
+.preview-location{
+  font-size:10px;
+  color:#888;
+}
+
+.preview-media{
+  aspect-ratio:4/5;
+  background:#eee;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+}
+
+.preview-media img,
+.preview-media video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:none;
+}
+
+.preview-placeholder{
+  color:#888;
+  font-size:12px;
+  text-align:center;
+  padding:20px;
+}
+
+.preview-caption{
+  padding:12px;
+  font-size:12px;
+}
+
+/* ROLES */
 
 .roles{
   display:grid;
@@ -238,128 +486,239 @@ select:focus{
 }
 
 .role{
-  background:#FAF7F5;
-  border:1px solid #eadfdd;
-  border-radius:12px;
+  border:1px solid var(--border);
+  background:var(--cream);
+  border-radius:13px;
   padding:13px;
 }
 
-.role b{
-  display:block;
-  margin-bottom:4px;
-}
-
-.role span{
-  color:#777;
-  font-size:12px;
-}
-
-.result{
-  margin-top:15px;
-  background:#111;
-  color:#fff;
-  border-radius:12px;
-  padding:15px;
-  white-space:pre-wrap;
-  word-break:break-word;
+.role-title{
+  font-weight:900;
   font-size:13px;
-  display:none;
 }
 
-.result.show{
-  display:block;
+.role-desc{
+  color:#777;
+  font-size:11px;
+  margin-top:3px;
 }
 
-.preview{
-  margin-top:15px;
-  display:none;
-}
+/* ANGLES */
 
-.preview img,
-.preview video{
-  max-width:100%;
-  border-radius:15px;
-  max-height:500px;
-  object-fit:contain;
-  background:#111;
-}
-
-.steps{
+.angle-grid{
   display:grid;
-  grid-template-columns:repeat(5,1fr);
+  grid-template-columns:repeat(3,1fr);
   gap:10px;
-  margin-top:18px;
+  margin-top:15px;
 }
 
-.step{
-  padding:14px;
-  border-radius:12px;
-  background:#FAF7F5;
-  border:1px solid #eadfdd;
-  text-align:center;
-  font-size:12px;
+.angle{
+  border:1px solid var(--border);
+  background:var(--cream);
+  border-radius:13px;
+  padding:15px;
 }
 
-.step.active{
-  background:#E8B4B8;
-  color:#111;
-  border-color:#E8B4B8;
+.angle-number{
+  font-size:11px;
+  color:#888;
+}
+
+.angle-title{
+  font-weight:900;
+  margin-top:4px;
+}
+
+/* CALENDAR */
+
+.calendar{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:5px;
+  margin-top:15px;
+}
+
+.day{
+  min-height:75px;
+  background:var(--cream);
+  border:1px solid var(--border);
+  border-radius:9px;
+  padding:7px;
+  font-size:10px;
+}
+
+.day b{
+  font-size:11px;
+}
+
+.event{
+  margin-top:7px;
+  background:var(--pink);
+  border-radius:6px;
+  padding:4px;
   font-weight:800;
 }
 
-.footer{
-  text-align:center;
-  color:#888;
-  padding:25px 10px;
+/* ANALYTICS */
+
+.analytics{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-top:15px;
+}
+
+.analytics-box{
+  background:var(--cream);
+  border:1px solid var(--border);
+  border-radius:13px;
+  padding:15px;
+}
+
+.analytics-box small{
+  color:#777;
+}
+
+.analytics-box strong{
+  display:block;
+  font-size:22px;
+  margin-top:3px;
+}
+
+/* HISTORY */
+
+.history{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-top:15px;
+}
+
+.history-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  padding:12px;
+  background:var(--cream);
+  border:1px solid var(--border);
+  border-radius:11px;
+}
+
+.history-name{
+  font-weight:800;
   font-size:12px;
 }
 
-@media(max-width:850px){
-  .grid,
+.history-time{
+  font-size:10px;
+  color:#888;
+}
+
+/* TOAST */
+
+.toast{
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  z-index:200;
+  max-width:330px;
+  padding:14px 16px;
+  border-radius:13px;
+  background:#111;
+  color:#fff;
+  box-shadow:0 12px 35px rgba(0,0,0,.25);
+  display:none;
+  font-size:12px;
+  font-weight:800;
+}
+
+.toast.show{
+  display:block;
+}
+
+/* FOOTER */
+
+footer{
+  text-align:center;
+  color:#888;
+  font-size:11px;
+  padding:20px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:950px){
+
+  .metrics{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+  .workflow{
+    grid-template-columns:repeat(4,1fr);
+  }
+
+  .form-grid{
+    grid-template-columns:1fr 1fr;
+  }
+
   .roles{
     grid-template-columns:1fr 1fr;
   }
 
-  .metrics{
+  .analytics{
     grid-template-columns:1fr 1fr;
   }
+}
 
-  .steps{
-    grid-template-columns:1fr 1fr;
+@media(max-width:650px){
+
+  .topbar-inner{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .connection{
+    width:100%;
+    justify-content:flex-start;
+  }
+
+  .hero{
+    padding:23px;
+    border-radius:18px;
   }
 
   .hero h1{
     font-size:27px;
   }
-}
 
-@media(max-width:550px){
-  .header-inner{
-    align-items:flex-start;
-    flex-direction:column;
-  }
-
-  .grid,
-  .roles,
   .metrics,
-  .steps{
+  .grid,
+  .form-grid,
+  .roles,
+  .angle-grid,
+  .analytics{
     grid-template-columns:1fr;
   }
 
-  main{
-    padding:16px 12px 40px;
+  .card.full{
+    grid-column:auto;
   }
 
-  .hero{
-    padding:22px;
-    border-radius:17px;
+  .workflow{
+    grid-template-columns:1fr 1fr;
   }
 
-  .hero h1{
-    font-size:24px;
+  .calendar{
+    grid-template-columns:repeat(2,1fr);
   }
 
-  .actions button{
+  .actions{
+    flex-direction:column;
+  }
+
+  .actions .btn,
+  .hero-actions .btn{
     width:100%;
   }
 }
@@ -368,57 +727,97 @@ select:focus{
 
 <body>
 
-<header>
-  <div class="header-inner">
+<header class="topbar">
 
-    <div>
-      <div class="logo">
-        SEOUL <span>AI FASHION</span>
+  <div class="topbar-inner">
+
+    <div class="brand">
+
+      <div class="brand-icon">S</div>
+
+      <div>
+        <div class="brand-title">
+          SEOUL AI FASHION
+        </div>
+
+        <div class="brand-sub">
+          Instagram Marketing Automation
+        </div>
       </div>
-      <div style="font-size:11px;color:#aaa;margin-top:3px;">
-        Instagram Marketing Automation
-      </div>
+
     </div>
 
-    <div class="status">
-      <span class="dot" id="statusDot"></span>
-      <span id="statusText">Checking Instagram...</span>
-      <button class="btn-pink" id="connectBtn" onclick="connectInstagram()">
+    <div class="connection">
+
+      <span
+        id="connectionDot"
+        class="connection-dot">
+      </span>
+
+      <span
+        id="connectionText"
+        class="connection-text">
+        Checking Instagram...
+      </span>
+
+      <button
+        id="connectButton"
+        class="btn btn-pink"
+        onclick="connectInstagram()">
         Connect Instagram
       </button>
+
     </div>
 
   </div>
+
 </header>
+
 
 <main>
 
+<div class="container">
+
+
+<!-- HERO -->
+
 <section class="hero">
 
-  <span class="hero-badge">KOREAN • SEOUL • FASHION • AI</span>
+  <span class="hero-badge">
+    🇰🇷 KOREAN • SEOUL • LUXURY FASHION • AI
+  </span>
 
   <h1>
-    Seoul AI Fashion Marketing
+    Create. Edit. Publish.<br>
+    Your Seoul Fashion Content.
   </h1>
 
   <p>
-    Create Korean-inspired fashion campaigns, plan multiple angles,
-    generate captions and prepare your Instagram posts and Reels
-    from one simple dashboard.
+    एक ही dashboard से Korean/Seoul fashion campaigns,
+    multiple angles, captions, Reels और Instagram publishing
+    workflow manage करें।
   </p>
 
-  <div class="actions">
-    <button class="btn-pink" onclick="startCampaign()">
+  <div class="hero-actions">
+
+    <button
+      class="btn btn-pink"
+      onclick="startMarketing()">
       ✨ Start Instagram Marketing
     </button>
 
-    <button class="btn-light" onclick="checkInstagram()">
-      🔄 Check Instagram
+    <button
+      class="btn btn-white"
+      onclick="scrollToSection('campaign')">
+      🎨 Create Campaign
     </button>
 
-    <button class="btn-danger" onclick="disconnectInstagram()">
-      Disconnect
+    <button
+      class="btn btn-white"
+      onclick="scrollToSection('publish')">
+      📤 Publish
     </button>
+
   </div>
 
 </section>
@@ -429,148 +828,541 @@ select:focus{
 <section class="metrics">
 
   <div class="metric">
-    <small>Campaign Status</small>
-    <strong id="campaignStatus">Ready</strong>
+    <div class="metric-label">
+      Instagram
+    </div>
+
+    <div
+      id="metricInstagram"
+      class="metric-value">
+      OFF
+    </div>
   </div>
 
   <div class="metric">
-    <small>Angles</small>
-    <strong id="angleMetric">6</strong>
+    <div class="metric-label">
+      Campaign
+    </div>
+
+    <div
+      id="metricCampaign"
+      class="metric-value">
+      Ready
+    </div>
   </div>
 
   <div class="metric">
-    <small>Reel Length</small>
-    <strong>10s</strong>
+    <div class="metric-label">
+      Angles
+    </div>
+
+    <div
+      id="metricAngles"
+      class="metric-value">
+      6
+    </div>
   </div>
 
   <div class="metric">
-    <small>Instagram</small>
-    <strong id="igMetric">OFF</strong>
+    <div class="metric-label">
+      Reel
+    </div>
+
+    <div class="metric-value">
+      10s
+    </div>
+  </div>
+
+  <div class="metric">
+    <div class="metric-label">
+      Content
+    </div>
+
+    <div
+      id="metricContent"
+      class="metric-value">
+      0
+    </div>
   </div>
 
 </section>
 
 
-<!-- CAMPAIGN CREATOR -->
+<!-- CAMPAIGN -->
 
-<section class="card full">
+<section
+  id="campaign"
+  class="card full">
 
-  <h2>🎨 AI Fashion Campaign Creator</h2>
-
-  <p>
-    Enter your fashion idea. The system will prepare the campaign workflow.
-  </p>
-
-  <label>Fashion Prompt</label>
-
-  <textarea id="prompt">Elegant Korean Seoul fashion editorial, stylish young adult woman wearing a premium designer outfit, beautiful Seoul cafe background, soft natural daylight, realistic luxury fashion photography, full body, elegant Korean fashion aesthetic, Instagram editorial quality.</textarea>
-
-  <div class="grid" style="margin-top:5px;margin-bottom:0;">
+  <div class="card-header">
 
     <div>
-      <label>Number of Angles</label>
+      <h2>🎨 AI Fashion Campaign Creator</h2>
 
-      <select id="angles">
-        <option value="4">4 Angles</option>
-        <option value="6" selected>6 Angles</option>
-        <option value="8">8 Angles</option>
-        <option value="10">10 Angles</option>
-      </select>
+      <p class="muted">
+        अपना fashion idea लिखें और complete campaign plan तैयार करें।
+      </p>
     </div>
 
+    <button
+      class="btn btn-outline"
+      onclick="resetCampaign()">
+      ↻ Reset
+    </button>
+
+  </div>
+
+
+  <label>
+    Fashion Prompt
+  </label>
+
+  <textarea
+    id="fashionPrompt"
+    placeholder="Describe your fashion campaign...">Elegant Korean Seoul fashion editorial, stylish young adult woman wearing a premium designer outfit, beautiful Seoul cafe background, soft natural daylight, realistic luxury fashion photography, full body, elegant Korean fashion aesthetic, Instagram editorial quality.</textarea>
+
+
+  <div class="presets">
+
+    <button
+      class="preset"
+      onclick="usePreset('Seoul Cafe')">
+      ☕ Seoul Cafe
+    </button>
+
+    <button
+      class="preset"
+      onclick="usePreset('Seoul Street')">
+      🏙️ Seoul Street
+    </button>
+
+    <button
+      class="preset"
+      onclick="usePreset('Cherry Blossom')">
+      🌸 Cherry Blossom
+    </button>
+
+    <button
+      class="preset"
+      onclick="usePreset('Luxury Designer')">
+      👗 Luxury Designer
+    </button>
+
+    <button
+      class="preset"
+      onclick="usePreset('Minimal Korean')">
+      🖤 Minimal Korean
+    </button>
+
+  </div>
+
+
+  <div class="form-grid">
+
     <div>
-      <label>Content Type</label>
+
+      <label>
+        Number of Angles
+      </label>
+
+      <select id="angleCount">
+
+        <option value="4">
+          4 Angles
+        </option>
+
+        <option value="6" selected>
+          6 Angles
+        </option>
+
+        <option value="8">
+          8 Angles
+        </option>
+
+        <option value="10">
+          10 Angles
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div>
+
+      <label>
+        Content Type
+      </label>
 
       <select id="contentType">
-        <option>Fashion Photo</option>
-        <option>Instagram Carousel</option>
-        <option>Instagram Reel</option>
-        <option>Photo + Reel Campaign</option>
+
+        <option>
+          Fashion Photo
+        </option>
+
+        <option>
+          Instagram Carousel
+        </option>
+
+        <option>
+          Instagram Reel
+        </option>
+
+        <option selected>
+          Photo + Reel Campaign
+        </option>
+
       </select>
+
     </div>
 
-    <div>
-      <label>Style</label>
 
-      <select id="style">
-        <option>Korean Seoul Luxury</option>
-        <option>Seoul Street Fashion</option>
-        <option>Korean Cafe Fashion</option>
-        <option>Korean Minimal Fashion</option>
-        <option>Korean Designer Editorial</option>
+    <div>
+
+      <label>
+        Fashion Style
+      </label>
+
+      <select id="fashionStyle">
+
+        <option>
+          Korean Seoul Luxury
+        </option>
+
+        <option>
+          Korean Cafe Fashion
+        </option>
+
+        <option>
+          Seoul Street Fashion
+        </option>
+
+        <option>
+          Korean Minimal Fashion
+        </option>
+
+        <option>
+          Korean Designer Editorial
+        </option>
+
       </select>
+
     </div>
 
   </div>
+
 
   <div class="actions">
 
-    <button class="btn-pink" onclick="generatePlan()">
+    <button
+      id="generatePlanButton"
+      class="btn btn-pink"
+      onclick="generateCampaignPlan()">
       ✨ Generate Campaign Plan
     </button>
 
-    <button class="btn-light" onclick="generateCaption()">
-      ✍ Generate Caption
+    <button
+      class="btn btn-dark"
+      onclick="generateCaption()">
+      ✍ Create Caption
+    </button>
+
+    <button
+      class="btn btn-white"
+      onclick="generateHashtags()">
+      #️⃣ Create Hashtags
     </button>
 
   </div>
 
-  <div class="steps">
 
-    <div class="step" id="step1">1<br>AI Image</div>
-    <div class="step" id="step2">2<br>Angles</div>
-    <div class="step" id="step3">3<br>10s Reel</div>
-    <div class="step" id="step4">4<br>Caption</div>
-    <div class="step" id="step5">5<br>Publish</div>
+  <!-- WORKFLOW -->
+
+  <div class="workflow">
+
+    <div
+      id="workflow1"
+      class="workflow-step">
+      1<br>📝 Prompt
+    </div>
+
+    <div
+      id="workflow2"
+      class="workflow-step">
+      2<br>🖼️ AI Image
+    </div>
+
+    <div
+      id="workflow3"
+      class="workflow-step">
+      3<br>🔄 Angles
+    </div>
+
+    <div
+      id="workflow4"
+      class="workflow-step">
+      4<br>🎬 Reel
+    </div>
+
+    <div
+      id="workflow5"
+      class="workflow-step">
+      5<br>✍ Caption
+    </div>
+
+    <div
+      id="workflow6"
+      class="workflow-step">
+      6<br>👀 Preview
+    </div>
+
+    <div
+      id="workflow7"
+      class="workflow-step">
+      7<br>📤 Publish
+    </div>
 
   </div>
 
-  <div id="planResult" class="result"></div>
+
+  <div
+    id="campaignResult"
+    class="result">
+  </div>
 
 </section>
 
 
-<!-- IMAGE PUBLISH -->
+<!-- ANGLES -->
+
+<section class="card full">
+
+  <div class="card-header">
+
+    <div>
+      <h2>📸 Multi-Angle Fashion Plan</h2>
+
+      <p class="muted">
+        Consistent fashion campaign के लिए planned camera angles।
+      </p>
+    </div>
+
+  </div>
+
+
+  <div class="angle-grid">
+
+    <div class="angle">
+      <div class="angle-number">ANGLE 01</div>
+      <div class="angle-title">Full Body Hero</div>
+      <div class="muted">
+        Complete outfit + environment
+      </div>
+    </div>
+
+    <div class="angle">
+      <div class="angle-number">ANGLE 02</div>
+      <div class="angle-title">Front Fashion</div>
+      <div class="muted">
+        Outfit details from front
+      </div>
+    </div>
+
+    <div class="angle">
+      <div class="angle-number">ANGLE 03</div>
+      <div class="angle-title">Side Profile</div>
+      <div class="muted">
+        Elegant side composition
+      </div>
+    </div>
+
+    <div class="angle">
+      <div class="angle-number">ANGLE 04</div>
+      <div class="angle-title">Walking Shot</div>
+      <div class="muted">
+        Natural fashion movement
+      </div>
+    </div>
+
+    <div class="angle">
+      <div class="angle-number">ANGLE 05</div>
+      <div class="angle-title">Close Detail</div>
+      <div class="muted">
+        Face, fabric and accessories
+      </div>
+    </div>
+
+    <div class="angle">
+      <div class="angle-number">ANGLE 06</div>
+      <div class="angle-title">Back / Editorial</div>
+      <div class="muted">
+        Back view + environment
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- CONTENT CREATION -->
 
 <section class="grid">
 
+  <!-- CAPTION -->
+
   <div class="card">
 
-    <h3>📸 Instagram Photo</h3>
+    <div class="card-header">
 
-    <p>
-      Public HTTPS image URL डालें और Instagram पर publish करें।
-    </p>
+      <div>
+        <h3>✍ Caption Studio</h3>
 
-    <label>Public Image URL</label>
+        <p class="muted">
+          Instagram-ready caption तैयार करें।
+        </p>
+      </div>
 
-    <input
-      id="imageUrl"
-      type="url"
-      placeholder="https://example.com/fashion-image.jpg"
-    >
+    </div>
 
-    <label>Caption</label>
+    <label>
+      Caption
+    </label>
 
     <textarea
-      id="imageCaption"
-      style="min-height:100px;"
-      placeholder="Write your Instagram caption..."
-    ></textarea>
+      id="caption"
+      placeholder="Your Instagram caption will appear here..."></textarea>
 
     <div class="actions">
 
       <button
-        class="btn-pink"
-        id="publishImageBtn"
-        onclick="publishImage()"
-      >
-        📤 Publish Photo
+        class="btn btn-pink"
+        onclick="generateCaption()">
+        ✨ Generate
+      </button>
+
+      <button
+        class="btn btn-white"
+        onclick="copyText('caption')">
+        📋 Copy
       </button>
 
     </div>
 
-    <div id="imageResult" class="result"></div>
+  </div>
+
+
+  <!-- HASHTAGS -->
+
+  <div class="card">
+
+    <div class="card-header">
+
+      <div>
+        <h3>#️⃣ Hashtag Studio</h3>
+
+        <p class="muted">
+          Korean fashion और Seoul style hashtags।
+        </p>
+      </div>
+
+    </div>
+
+    <label>
+      Hashtags
+    </label>
+
+    <textarea
+      id="hashtags"
+      placeholder="#KoreanFashion #SeoulFashion..."></textarea>
+
+    <div class="actions">
+
+      <button
+        class="btn btn-pink"
+        onclick="generateHashtags()">
+        ✨ Generate
+      </button>
+
+      <button
+        class="btn btn-white"
+        onclick="copyText('hashtags')">
+        📋 Copy
+      </button>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- PUBLISH -->
+
+<section
+  id="publish"
+  class="grid">
+
+
+  <!-- PHOTO -->
+
+  <div class="card">
+
+    <div class="card-header">
+
+      <div>
+        <h2>📸 Instagram Photo</h2>
+
+        <p class="muted">
+          Public HTTPS image URL से Instagram photo publish करें।
+        </p>
+      </div>
+
+    </div>
+
+
+    <label>
+      Public Image URL
+    </label>
+
+    <input
+      id="imageUrl"
+      type="url"
+      placeholder="https://example.com/image.jpg"
+      oninput="updatePreview()">
+
+
+    <label>
+      Caption
+    </label>
+
+    <textarea
+      id="imageCaption"
+      placeholder="Instagram caption..."></textarea>
+
+
+    <div class="actions">
+
+      <button
+        id="publishImageButton"
+        class="btn btn-pink"
+        onclick="publishImage()">
+        📤 Publish Photo
+      </button>
+
+      <button
+        class="btn btn-white"
+        onclick="previewImage()">
+        👀 Preview
+      </button>
+
+    </div>
+
+
+    <div
+      id="imageResult"
+      class="result">
+    </div>
 
   </div>
 
@@ -579,132 +1371,60 @@ select:focus{
 
   <div class="card">
 
-    <h3>🎬 Instagram Reel</h3>
+    <div class="card-header">
 
-    <p>
-      Public HTTPS video URL देकर Reel container बनाएं।
-    </p>
+      <div>
+        <h2>🎬 Instagram Reel</h2>
 
-    <label>Public Video URL</label>
+        <p class="muted">
+          Public HTTPS video URL से Reel workflow शुरू करें।
+        </p>
+      </div>
+
+    </div>
+
+
+    <label>
+      Public Video URL
+    </label>
 
     <input
       id="videoUrl"
       type="url"
-      placeholder="https://example.com/fashion-reel.mp4"
-    >
+      placeholder="https://example.com/reel.mp4"
+      oninput="updateVideoPreview()">
 
-    <label>Reel Caption</label>
+
+    <label>
+      Reel Caption
+    </label>
 
     <textarea
       id="reelCaption"
-      style="min-height:100px;"
-      placeholder="Write your Reel caption..."
-    ></textarea>
+      placeholder="Reel caption..."></textarea>
+
 
     <div class="actions">
 
       <button
-        class="btn-pink"
-        id="publishReelBtn"
-        onclick="publishReel()"
-      >
+        id="publishReelButton"
+        class="btn btn-pink"
+        onclick="publishReel()">
         🎬 Create Reel
       </button>
 
-    </div>
-
-    <div id="reelResult" class="result"></div>
-
-  </div>
-
-
-  <!-- AI CONTENT -->
-
-  <div class="card">
-
-    <h3>🤖 AI Content Assistant</h3>
-
-    <p>
-      Fashion campaign के लिए caption और hashtags तैयार करें।
-    </p>
-
-    <label>Campaign Topic</label>
-
-    <input
-      id="captionTopic"
-      value="Korean Seoul luxury fashion"
-    >
-
-    <div class="actions">
-
-      <button class="btn-pink" onclick="generateCaption()">
-        ✍ Create Caption
+      <button
+        class="btn btn-white"
+        onclick="copyText('reelCaption')">
+        📋 Copy Caption
       </button>
 
     </div>
 
-    <div id="captionResult" class="result"></div>
 
-  </div>
-
-</section>
-
-
-<!-- ROLES -->
-
-<section class="card full">
-
-  <h2>👩‍💼 Instagram Marketing Team</h2>
-
-  <p>
-    आपके automation dashboard में पूरी marketing workflow के लिए roles:
-  </p>
-
-  <div class="roles">
-
-    <div class="role">
-      <b>📱 Social Media Manager</b>
-      <span>Campaign planning & publishing</span>
-    </div>
-
-    <div class="role">
-      <b>✨ Content Creator</b>
-      <span>AI fashion content creation</span>
-    </div>
-
-    <div class="role">
-      <b>🎬 Video Editor</b>
-      <span>Reels & short videos</span>
-    </div>
-
-    <div class="role">
-      <b>🎨 Graphic Designer</b>
-      <span>Visual design & creatives</span>
-    </div>
-
-    <div class="role">
-      <b>✍ Copywriter</b>
-      <span>Captions & hashtags</span>
-    </div>
-
-    <div class="role">
-      <b>📸 Photographer / Model</b>
-      <span>Fashion visual direction</span>
-    </div>
-
-    <div class="role">
-      <b>💬 Community Manager</b>
-      <span>Audience engagement</span>
-    </div>
-
-    <div class="role">
-      <b>📢 Instagram Ads Manager</b>
-      <span>Campaign advertising</span>
-    </div>
-
-    <div class="role">
-      <b>📊 SEO / Analytics</b>
-      <span>Performance & insights</span>
+    <div
+      id="reelResult"
+      class="result">
     </div>
 
   </div>
@@ -712,129 +1432,559 @@ select:focus{
 </section>
 
 
-<!-- WORKFLOW -->
+<!-- INSTAGRAM PREVIEW -->
 
 <section class="card full">
 
-  <h2>⚡ One-Click Campaign Workflow</h2>
+  <div class="card-header">
 
-  <p>
-    आपका पूरा campaign इस workflow के अनुसार तैयार किया जा सकता है:
-  </p>
+    <div>
+      <h2>👀 Instagram Preview</h2>
 
-  <div class="steps">
-
-    <div class="step">📝<br>Text Prompt</div>
-    <div class="step">🖼️<br>AI Fashion Image</div>
-    <div class="step">🔄<br>6 Variations</div>
-    <div class="step">🎬<br>10s Reel</div>
-    <div class="step">📤<br>Instagram</div>
+      <p class="muted">
+        Publish करने से पहले content का preview देखें।
+      </p>
+    </div>
 
   </div>
+
+
+  <div class="instagram-preview">
+
+    <div class="preview-head">
+
+      <div class="avatar">
+        S
+      </div>
+
+      <div>
+
+        <div class="preview-name">
+          Seoul Fashion
+        </div>
+
+        <div class="preview-location">
+          Seoul, Korea
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="preview-media">
+
+      <div
+        id="previewPlaceholder"
+        class="preview-placeholder">
+        Your fashion image preview will appear here.
+      </div>
+
+      <img
+        id="previewImage"
+        alt="Instagram preview">
+
+      <video
+        id="previewVideo"
+        controls
+        playsinline>
+      </video>
+
+    </div>
+
+
+    <div
+      id="previewCaption"
+      class="preview-caption">
+      Your caption will appear here.
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- SCHEDULER -->
+
+<section class="card full">
+
+  <div class="card-header">
+
+    <div>
+      <h2>📅 Content Scheduler</h2>
+
+      <p class="muted">
+        Future publishing के लिए campaign schedule तैयार करें।
+      </p>
+    </div>
+
+    <span class="muted">
+      Planning Mode
+    </span>
+
+  </div>
+
+
+  <div class="form-grid">
+
+    <div>
+
+      <label>
+        Date
+      </label>
+
+      <input
+        id="scheduleDate"
+        type="date">
+
+    </div>
+
+    <div>
+
+      <label>
+        Time
+      </label>
+
+      <input
+        id="scheduleTime"
+        type="time">
+
+    </div>
+
+    <div>
+
+      <label>
+        Content
+      </label>
+
+      <select id="scheduleType">
+
+        <option>
+          Photo
+        </option>
+
+        <option>
+          Carousel
+        </option>
+
+        <option>
+          Reel
+        </option>
+
+      </select>
+
+    </div>
+
+  </div>
+
 
   <div class="actions">
 
-    <button class="btn-pink" onclick="runFullWorkflow()">
-      🚀 Run Campaign Workflow
+    <button
+      class="btn btn-pink"
+      onclick="addSchedule()">
+      ➕ Add to Calendar
     </button>
 
   </div>
 
-  <div id="workflowResult" class="result"></div>
+
+  <div
+    id="scheduleResult"
+    class="result">
+  </div>
+
+
+  <div
+    id="calendar"
+    class="calendar">
+  </div>
 
 </section>
 
 
-<footer class="footer">
-  Seoul AI Fashion Marketing • Instagram Automation Dashboard
-</footer>
+<!-- ANALYTICS -->
+
+<section class="card full">
+
+  <div class="card-header">
+
+    <div>
+      <h2>📊 Instagram Analytics</h2>
+
+      <p class="muted">
+        Dashboard structure ready for real Instagram Insights data.
+      </p>
+    </div>
+
+  </div>
+
+
+  <div class="analytics">
+
+    <div class="analytics-box">
+      <small>Posts</small>
+      <strong id="analyticsPosts">0</strong>
+    </div>
+
+    <div class="analytics-box">
+      <small>Reels</small>
+      <strong id="analyticsReels">0</strong>
+    </div>
+
+    <div class="analytics-box">
+      <small>Campaigns</small>
+      <strong id="analyticsCampaigns">0</strong>
+    </div>
+
+    <div class="analytics-box">
+      <small>Status</small>
+      <strong id="analyticsStatus">Ready</strong>
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- HISTORY -->
+
+<section class="card full">
+
+  <div class="card-header">
+
+    <div>
+      <h2>🗂️ Campaign History</h2>
+
+      <p class="muted">
+        इस browser में बनाए गए campaign drafts।
+      </p>
+    </div>
+
+    <button
+      class="btn btn-outline"
+      onclick="clearHistory()">
+      Clear
+    </button>
+
+  </div>
+
+
+  <div
+    id="history"
+    class="history">
+  </div>
+
+</section>
+
+
+<!-- MARKETING ROLES -->
+
+<section class="card full">
+
+  <div class="card-header">
+
+    <div>
+      <h2>👩‍💼 Complete Instagram Marketing Team</h2>
+
+      <p class="muted">
+        पूरा social media workflow एक dashboard में।
+      </p>
+    </div>
+
+  </div>
+
+
+  <div class="roles">
+
+    <div class="role">
+      <div class="role-title">
+        📱 Social Media Manager
+      </div>
+      <div class="role-desc">
+        Campaign planning & publishing
+      </div>
+    </div>
+
+    <div class="role">
+      <div class="role-title">
+        ✨ Content Creator
+      </div>
+      <div class="role-desc">
+        AI fashion content
+      </div>
+    </div>
+
+    <div class="role">
+      <div class="role-title">
+        🎬 Video Editor
+      </div>
+      <div class="role-desc">
+        Reels & short videos
+      </div>
+    </div>
+
+    <div class="role">
+      <div class="role-title">
+        🎨 Graphic Designer
+      </div>
+      <div class="role-desc">
+        Visual design
+      </div>
+    </div>
+
+    <div class="role">
+      <div class="role-title">
+        ✍ Copywriter
+      </div>
+      <div class="role-desc">
+        Captions & hashtags
+      </div>
+    </div>
+
+    <div class="role">
+      <div class="role-title">
+        📸 Photographer / Model
+      </div>
+      <div class="role-desc">
+        Fashion visual direction
+      </div>
+    </div>
+
+    <div class="role">
+      <div class="role-title">
+        💬 Community Manager
+      </div>
+      <div class="role-desc">
+        Audience engagement
+      </div>
+    </div>
+
+    <div class="role">
+      <div class="role-title">
+        📢 Instagram Ads Manager
+      </div>
+      <div class="role-desc">
+        Advertising workflow
+      </div>
+    </div>
+
+    <div class="role">
+      <div class="role-title">
+        📊 SEO / Analytics
+      </div>
+      <div class="role-desc">
+        Performance insights
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- FINAL WORKFLOW -->
+
+<section class="hero">
+
+  <span class="hero-badge">
+    ONE CLICK WORKFLOW
+  </span>
+
+  <h1 style="font-size:28px;">
+    AI Fashion → Instagram
+  </h1>
+
+  <p>
+    Prompt से लेकर campaign planning, caption, preview और
+    supported Instagram publishing तक पूरा workflow एक जगह।
+  </p>
+
+  <div class="hero-actions">
+
+    <button
+      class="btn btn-pink"
+      onclick="runFullWorkflow()">
+      🚀 Run Campaign Workflow
+    </button>
+
+    <button
+      class="btn btn-white"
+      onclick="checkInstagram()">
+      🔄 Refresh Instagram Status
+    </button>
+
+  </div>
+
+  <div
+    id="fullWorkflowResult"
+    class="result">
+  </div>
+
+</section>
+
+
+</div>
 
 </main>
 
 
+<footer>
+  Seoul AI Fashion Marketing • Built for Korean / Seoul Fashion Content
+</footer>
+
+
+<div
+  id="toast"
+  class="toast">
+</div>
+
+
 <script>
 
-const API = "";
+/* =========================================================
+   SEOUL AI FASHION MARKETING
+   FRONTEND
+========================================================= */
+
+const state = {
+  instagramConnected:false,
+  campaigns:0,
+  posts:0,
+  reels:0
+};
 
 
-/* -----------------------------
-   BASIC HELPERS
------------------------------ */
+/* =========================================================
+   HELPERS
+========================================================= */
 
 function $(id){
   return document.getElementById(id);
 }
 
-function showResult(id, text){
+
+function showResult(id,text,type=""){
   const el = $(id);
+
+  if(!el) return;
+
   el.textContent = text;
+
+  el.className = "result show " + type;
+}
+
+
+function toast(message){
+  const el = $("toast");
+
+  el.textContent = message;
+
   el.classList.add("show");
+
+  clearTimeout(window.__toastTimer);
+
+  window.__toastTimer =
+    setTimeout(()=>{
+      el.classList.remove("show");
+    },3000);
 }
 
-function hideResult(id){
-  $(id).classList.remove("show");
+
+function scrollToSection(id){
+  const el = $(id);
+
+  if(el){
+    el.scrollIntoView({
+      behavior:"smooth",
+      block:"start"
+    });
+  }
 }
 
 
-/* -----------------------------
-   INSTAGRAM STATUS
------------------------------ */
+/* =========================================================
+   INSTAGRAM CONNECTION
+========================================================= */
 
 async function checkInstagram(){
 
+  $("connectionText").textContent =
+    "Checking Instagram...";
+
   try{
 
-    $("statusText").textContent = "Checking...";
-
     const response =
-      await fetch("/api/instagram/status");
+      await fetch("/api/instagram/status",{
+        cache:"no-store"
+      });
 
     const data =
       await response.json();
 
     if(data.ok && data.connected){
 
-      $("statusDot").classList.add("online");
+      state.instagramConnected = true;
 
-      $("statusText").textContent =
-        "Connected: @" + (data.instagram?.username || "Instagram");
+      $("connectionDot")
+        .classList.add("online");
 
-      $("connectBtn").textContent =
+      $("connectionText").textContent =
+        "Connected: @" +
+        (data.instagram?.username || "Instagram");
+
+      $("connectButton").textContent =
         "Instagram Connected";
 
-      $("igMetric").textContent = "ON";
+      $("metricInstagram").textContent =
+        "ON";
+
+      $("analyticsStatus").textContent =
+        "Connected";
+
+      toast("Instagram connected successfully.");
 
     }else{
 
-      $("statusDot").classList.remove("online");
+      state.instagramConnected = false;
 
-      $("statusText").textContent =
+      $("connectionDot")
+        .classList.remove("online");
+
+      $("connectionText").textContent =
         "Instagram not connected";
 
-      $("connectBtn").textContent =
+      $("connectButton").textContent =
         "Connect Instagram";
 
-      $("igMetric").textContent = "OFF";
+      $("metricInstagram").textContent =
+        "OFF";
+
+      $("analyticsStatus").textContent =
+        "Not Connected";
 
     }
 
   }catch(error){
 
-    $("statusDot").classList.remove("online");
+    state.instagramConnected = false;
 
-    $("statusText").textContent =
+    $("connectionDot")
+      .classList.remove("online");
+
+    $("connectionText").textContent =
       "Instagram setup required";
 
-    $("igMetric").textContent = "OFF";
+    $("metricInstagram").textContent =
+      "OFF";
+
+    $("analyticsStatus").textContent =
+      "API Error";
 
   }
 
 }
 
-
-/* -----------------------------
-   CONNECT
------------------------------ */
 
 function connectInstagram(){
 
@@ -844,149 +1994,254 @@ function connectInstagram(){
 }
 
 
-/* -----------------------------
-   DISCONNECT
------------------------------ */
-
 async function disconnectInstagram(){
 
   try{
 
     await fetch("/api/disconnect",{
+
       method:"POST",
+
       headers:{
-        "Content-Type":"application/json"
+        "Content-Type":
+          "application/json"
       },
+
       body:JSON.stringify({
-        sessionId:localStorage.getItem("ig_session")
+        sessionId:
+          localStorage.getItem("ig_session")
       })
+
     });
 
-  }catch(e){}
+  }catch(error){}
 
-  localStorage.removeItem("ig_session");
+  localStorage.removeItem(
+    "ig_session"
+  );
+
+  state.instagramConnected = false;
 
   checkInstagram();
 
 }
 
 
-/* -----------------------------
-   CAMPAIGN PLAN
------------------------------ */
+/* =========================================================
+   CAMPAIGN PRESETS
+========================================================= */
 
-async function generatePlan(){
+function usePreset(type){
+
+  const presets = {
+
+    "Seoul Cafe":
+`Elegant Korean Seoul cafe fashion editorial, stylish young adult woman wearing a premium feminine designer outfit, beautiful modern Seoul cafe, soft natural daylight, realistic luxury fashion photography, full body, clean composition, sophisticated Korean fashion aesthetic.`,
+
+    "Seoul Street":
+`Stylish Korean Seoul street fashion editorial, elegant young adult woman wearing a modern designer outfit, beautiful Seoul city street, premium storefronts, cinematic daylight, realistic fashion photography, full body, sophisticated Korean street style.`,
+
+    "Cherry Blossom":
+`Dreamy Korean Seoul spring fashion editorial, elegant young adult woman wearing a beautiful pastel designer outfit, cherry blossom street in Seoul, soft pink flowers, warm natural daylight, realistic luxury fashion photography, full body, romantic Korean fashion aesthetic.`,
+
+    "Luxury Designer":
+`High-end Korean luxury fashion editorial, elegant young adult woman wearing an exclusive designer outfit, sophisticated Seoul architectural background, cinematic soft lighting, premium magazine photography, full body, realistic details, luxury Korean fashion.`,
+
+    "Minimal Korean":
+`Minimal Korean fashion editorial, stylish young adult woman wearing a clean modern neutral designer outfit, minimalist Seoul architecture, soft daylight, realistic premium fashion photography, full body, elegant minimal Korean aesthetic.`
+
+  };
+
+  $("fashionPrompt").value =
+    presets[type] ||
+    presets["Seoul Cafe"];
+
+  toast(
+    type +
+    " fashion preset selected."
+  );
+
+}
+
+
+/* =========================================================
+   CAMPAIGN PLAN
+========================================================= */
+
+async function generateCampaignPlan(){
 
   const prompt =
-    $("prompt").value.trim();
+    $("fashionPrompt").value.trim();
 
   const angles =
-    Number($("angles").value);
+    Number($("angleCount").value);
 
   if(!prompt){
 
-    alert("Please enter a fashion prompt.");
+    toast(
+      "Please enter a fashion prompt."
+    );
 
     return;
 
   }
 
-  $("campaignStatus").textContent =
-    "Creating...";
+  $("generatePlanButton").disabled =
+    true;
 
-  activateStep(1);
+  $("generatePlanButton").textContent =
+    "Creating Plan...";
+
+  activateWorkflow(1);
+
+  $("metricCampaign").textContent =
+    "Creating";
 
   try{
 
     const response =
-      await fetch("/api/generate-plan",{
+      await fetch(
+        "/api/generate-plan",
+        {
+          method:"POST",
 
-        method:"POST",
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
 
-        headers:{
-          "Content-Type":"application/json"
-        },
-
-        body:JSON.stringify({
-          prompt,
-          angles
-        })
-
-      });
+          body:JSON.stringify({
+            prompt,
+            angles
+          })
+        }
+      );
 
     const data =
       await response.json();
 
-    let text =
-      "CAMPAIGN PLAN\n\n";
+    if(!response.ok){
 
-    text +=
-      "Prompt: " +
+      throw new Error(
+        data.error ||
+        "Campaign plan failed."
+      );
+
+    }
+
+    let result =
+      "✅ CAMPAIGN PLAN READY\n\n";
+
+    result +=
+      "Style: " +
+      $("fashionStyle").value +
+      "\n";
+
+    result +=
+      "Content: " +
+      $("contentType").value +
+      "\n";
+
+    result +=
+      "Angles: " +
+      angles +
+      "\n\n";
+
+    result +=
+      "PROMPT\n" +
       data.prompt +
       "\n\n";
 
-    text +=
-      "Angles: " +
-      data.angles +
-      "\n\n";
+    result +=
+      "WORKFLOW\n";
 
-    if(data.steps){
+    if(Array.isArray(data.steps)){
 
-      text +=
+      result +=
         data.steps
-          .map((x,i)=>(i+1)+". "+x)
+          .map(
+            (step,index)=>
+              `${index+1}. ${step}`
+          )
           .join("\n");
 
     }
 
     showResult(
-      "planResult",
-      text
+      "campaignResult",
+      result,
+      "success"
     );
 
-    $("angleMetric").textContent =
-      angles;
+    state.campaigns++;
 
-    $("campaignStatus").textContent =
+    $("metricCampaign").textContent =
       "Planned";
 
-    activateStep(2);
+    $("metricAngles").textContent =
+      angles;
+
+    $("analyticsCampaigns").textContent =
+      state.campaigns;
+
+    activateWorkflow(2);
+
+    saveHistory(
+      "Fashion Campaign • " +
+      $("fashionStyle").value
+    );
+
+    toast(
+      "Campaign plan created."
+    );
 
   }catch(error){
 
     showResult(
-      "planResult",
-      "Error: " + error.message
+      "campaignResult",
+      "❌ Campaign error\n\n" +
+      error.message,
+      "error"
     );
 
-    $("campaignStatus").textContent =
+    $("metricCampaign").textContent =
       "Error";
 
   }
 
+  $("generatePlanButton").disabled =
+    false;
+
+  $("generatePlanButton").textContent =
+    "✨ Generate Campaign Plan";
+
 }
 
 
-/* -----------------------------
-   CAPTION GENERATOR
------------------------------ */
+/* =========================================================
+   CAPTION
+========================================================= */
 
 function generateCaption(){
 
-  const topic =
-    $("captionTopic").value.trim() ||
-    "Korean Seoul luxury fashion";
+  const style =
+    $("fashionStyle").value;
 
   const caption =
 `✨ Seoul Fashion Mood ✨
 
-Elegant Korean-inspired fashion with a modern Seoul aesthetic.
+A refined Korean-inspired look with a modern Seoul aesthetic.
 
-Minimal details, sophisticated styling and effortless confidence — created for those who love premium fashion.
+Elegant details, effortless styling and timeless confidence — created for a beautiful fashion moment.
+
+Style: ${style}
 
 Discover your Seoul style. 🖤
 
-#KoreanFashion #SeoulFashion #KoreanStyle #SeoulStyle #FashionEditorial #LuxuryFashion #KFashion #KoreanOutfit #FashionInspiration #StyleInspiration #AIModel #FashionContent`;
+Follow for more Korean fashion inspiration & new looks.`;
+
+  $("caption").value =
+    caption;
 
   $("imageCaption").value =
     caption;
@@ -994,34 +2249,193 @@ Discover your Seoul style. 🖤
   $("reelCaption").value =
     caption;
 
-  showResult(
-    "captionResult",
-    "Caption created for:\n\n" +
-    topic +
-    "\n\n" +
-    caption
-  );
+  $("previewCaption").textContent =
+    caption;
 
-  activateStep(4);
+  activateWorkflow(5);
+
+  toast(
+    "Caption created."
+  );
 
 }
 
 
-/* -----------------------------
+/* =========================================================
+   HASHTAGS
+========================================================= */
+
+function generateHashtags(){
+
+  const tags =
+`#KoreanFashion
+#SeoulFashion
+#KoreanStyle
+#SeoulStyle
+#KFashion
+#KoreanOutfit
+#FashionEditorial
+#LuxuryFashion
+#FashionInspiration
+#StyleInspiration
+#SeoulStreetStyle
+#KoreanDesigner
+#FashionContent
+#AIFashion
+#SeoulKorea`;
+
+  $("hashtags").value =
+    tags;
+
+  toast(
+    "Hashtags created."
+  );
+
+}
+
+
+/* =========================================================
+   COPY
+========================================================= */
+
+async function copyText(id){
+
+  const el =
+    $(id);
+
+  if(!el || !el.value){
+
+    toast(
+      "Nothing to copy."
+    );
+
+    return;
+
+  }
+
+  try{
+
+    await navigator.clipboard.writeText(
+      el.value
+    );
+
+    toast(
+      "Copied to clipboard."
+    );
+
+  }catch(error){
+
+    el.select();
+
+    document.execCommand("copy");
+
+    toast(
+      "Copied."
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   PREVIEW
+========================================================= */
+
+function updatePreview(){
+
+  const url =
+    $("imageUrl").value.trim();
+
+  if(!url){
+
+    $("previewImage").style.display =
+      "none";
+
+    $("previewPlaceholder").style.display =
+      "block";
+
+    return;
+
+  }
+
+  $("previewImage").src =
+    url;
+
+  $("previewImage").style.display =
+    "block";
+
+  $("previewPlaceholder").style.display =
+    "none";
+
+  $("previewCaption").textContent =
+    $("imageCaption").value ||
+    "Your caption will appear here.";
+
+  activateWorkflow(6);
+
+}
+
+
+function previewImage(){
+
+  updatePreview();
+
+  scrollToSection(
+    "publish"
+  );
+
+  toast(
+    "Preview updated."
+  );
+
+}
+
+
+function updateVideoPreview(){
+
+  const url =
+    $("videoUrl").value.trim();
+
+  if(!url){
+
+    $("previewVideo").style.display =
+      "none";
+
+    return;
+
+  }
+
+  $("previewVideo").src =
+    url;
+
+  $("previewVideo").style.display =
+    "block";
+
+  $("previewImage").style.display =
+    "none";
+
+  $("previewPlaceholder").style.display =
+    "none";
+
+}
+
+
+/* =========================================================
    IMAGE PUBLISH
------------------------------ */
+========================================================= */
 
 async function publishImage(){
 
   const image_url =
     $("imageUrl").value.trim();
 
-  const caption =
+  let caption =
     $("imageCaption").value.trim();
 
   if(!image_url){
 
-    alert(
+    toast(
       "Please enter a public HTTPS image URL."
     );
 
@@ -1029,11 +2443,9 @@ async function publishImage(){
 
   }
 
-  if(
-    !image_url.startsWith("https://")
-  ){
+  if(!image_url.startsWith("https://")){
 
-    alert(
+    toast(
       "Image URL must start with https://"
     );
 
@@ -1041,10 +2453,22 @@ async function publishImage(){
 
   }
 
-  $("publishImageBtn").disabled = true;
+  if(!caption){
 
-  $("publishImageBtn").textContent =
+    caption =
+      $("caption").value.trim();
+
+  }
+
+  const button =
+    $("publishImageButton");
+
+  button.disabled = true;
+
+  button.textContent =
     "Publishing...";
+
+  activateWorkflow(7);
 
   try{
 
@@ -1053,10 +2477,12 @@ async function publishImage(){
         "/api/publish-image",
         {
           method:"POST",
+
           headers:{
             "Content-Type":
               "application/json"
           },
+
           body:JSON.stringify({
             image_url,
             caption
@@ -1067,25 +2493,11 @@ async function publishImage(){
     const data =
       await response.json();
 
-    if(data.ok){
+    if(!response.ok || !data.ok){
 
-      showResult(
-        "imageResult",
-        "✅ Instagram photo published successfully!\n\nMedia ID: " +
-        data.media_id
-      );
-
-      activateStep(5);
-
-      $("campaignStatus").textContent =
-        "Published";
-
-    }else{
-
-      showResult(
-        "imageResult",
-        "❌ Publishing failed\n\n" +
+      throw new Error(
         JSON.stringify(
+          data.error ||
           data,
           null,
           2
@@ -1094,39 +2506,78 @@ async function publishImage(){
 
     }
 
+    state.posts++;
+
+    $("metricContent").textContent =
+      state.posts +
+      state.reels;
+
+    $("analyticsPosts").textContent =
+      state.posts;
+
+    $("metricCampaign").textContent =
+      "Published";
+
+    showResult(
+      "imageResult",
+`✅ Instagram photo published successfully.
+
+Media ID:
+${data.media_id || "Returned by Instagram"}
+
+Container ID:
+${data.container_id || "N/A"}`,
+      "success"
+    );
+
+    toast(
+      "Instagram photo published."
+    );
+
+    saveHistory(
+      "Instagram Photo Published"
+    );
+
   }catch(error){
 
     showResult(
       "imageResult",
-      "❌ Error\n\n" +
-      error.message
+`❌ Instagram photo was not published.
+
+Reason:
+${error.message}`,
+      "error"
+    );
+
+    toast(
+      "Photo publishing failed."
     );
 
   }
 
-  $("publishImageBtn").disabled = false;
+  button.disabled = false;
 
-  $("publishImageBtn").textContent =
+  button.textContent =
     "📤 Publish Photo";
 
 }
 
 
-/* -----------------------------
+/* =========================================================
    REEL
------------------------------ */
+========================================================= */
 
 async function publishReel(){
 
   const video_url =
     $("videoUrl").value.trim();
 
-  const caption =
+  let caption =
     $("reelCaption").value.trim();
 
   if(!video_url){
 
-    alert(
+    toast(
       "Please enter a public HTTPS video URL."
     );
 
@@ -1134,11 +2585,9 @@ async function publishReel(){
 
   }
 
-  if(
-    !video_url.startsWith("https://")
-  ){
+  if(!video_url.startsWith("https://")){
 
-    alert(
+    toast(
       "Video URL must start with https://"
     );
 
@@ -1146,12 +2595,22 @@ async function publishReel(){
 
   }
 
-  $("publishReelBtn").disabled = true;
+  if(!caption){
 
-  $("publishReelBtn").textContent =
+    caption =
+      $("caption").value.trim();
+
+  }
+
+  const button =
+    $("publishReelButton");
+
+  button.disabled = true;
+
+  button.textContent =
     "Creating Reel...";
 
-  activateStep(3);
+  activateWorkflow(4);
 
   try{
 
@@ -1160,10 +2619,12 @@ async function publishReel(){
         "/api/publish-reel",
         {
           method:"POST",
+
           headers:{
             "Content-Type":
               "application/json"
           },
+
           body:JSON.stringify({
             video_url,
             caption
@@ -1174,22 +2635,11 @@ async function publishReel(){
     const data =
       await response.json();
 
-    if(data.ok){
+    if(!response.ok || !data.ok){
 
-      showResult(
-        "reelResult",
-        "✅ Reel container created.\n\nContainer ID: " +
-        data.container_id +
-        "\n\n" +
-        (data.note || "")
-      );
-
-    }else{
-
-      showResult(
-        "reelResult",
-        "❌ Reel creation failed\n\n" +
+      throw new Error(
         JSON.stringify(
+          data.error ||
           data,
           null,
           2
@@ -1198,103 +2648,91 @@ async function publishReel(){
 
     }
 
+    state.reels++;
+
+    $("metricContent").textContent =
+      state.posts +
+      state.reels;
+
+    $("analyticsReels").textContent =
+      state.reels;
+
+    showResult(
+      "reelResult",
+`✅ Reel container created.
+
+Container ID:
+${data.container_id}
+
+${data.note || ""}
+
+Note: Instagram Reel processing may need to finish before final publication.`,
+      "success"
+    );
+
+    toast(
+      "Reel container created."
+    );
+
+    saveHistory(
+      "Instagram Reel Created"
+    );
+
   }catch(error){
 
     showResult(
       "reelResult",
-      "❌ Error\n\n" +
-      error.message
+`❌ Reel creation failed.
+
+Reason:
+${error.message}`,
+      "error"
+    );
+
+    toast(
+      "Reel creation failed."
     );
 
   }
 
-  $("publishReelBtn").disabled = false;
+  button.disabled = false;
 
-  $("publishReelBtn").textContent =
+  button.textContent =
     "🎬 Create Reel";
 
 }
 
 
-/* -----------------------------
+/* =========================================================
    WORKFLOW
------------------------------ */
+========================================================= */
 
-async function runFullWorkflow(){
+function activateWorkflow(number){
 
-  $("campaignStatus").textContent =
-    "Running...";
-
-  activateStep(1);
-
-  await generatePlan();
-
-  activateStep(2);
-
-  setTimeout(()=>{
-    activateStep(3);
-  },500);
-
-  setTimeout(()=>{
-    generateCaption();
-  },900);
-
-  showResult(
-    "workflowResult",
-`🚀 Campaign workflow prepared.
-
-1. AI Fashion Image
-2. ${$("angles").value} controlled angles
-3. 10-second Reel
-4. Caption + hashtags
-5. Instagram publishing
-
-Next:
-Add a public HTTPS image/video URL and publish it through the dashboard.`
-  );
-
-}
-
-
-/* -----------------------------
-   START MARKETING
------------------------------ */
-
-function startCampaign(){
-
-  window.scrollTo({
-    top:document.querySelector(
-      ".card.full"
-    ).offsetTop - 80,
-    behavior:"smooth"
-  });
-
-  $("campaignStatus").textContent =
-    "Ready";
-
-}
-
-
-/* -----------------------------
-   STEP UI
------------------------------ */
-
-function activateStep(number){
-
-  for(
-    let i=1;
-    i<=5;
-    i++
-  ){
+  for(let i=1;i<=7;i++){
 
     const el =
-      $("step"+i);
+      $("workflow"+i);
 
-    if(el){
+    if(!el) continue;
 
-      el.classList.toggle(
-        "active",
-        i===number
+    el.classList.remove(
+      "active",
+      "done"
+    );
+
+    if(i<number){
+
+      el.classList.add(
+        "done"
+      );
+
+    }
+
+    if(i===number){
+
+      el.classList.add(
+        "active"
       );
 
     }
@@ -1304,14 +2742,429 @@ function activateStep(number){
 }
 
 
-/* -----------------------------
-   INITIAL LOAD
------------------------------ */
+async function runFullWorkflow(){
+
+  showResult(
+    "fullWorkflowResult",
+`🚀 Campaign workflow started.
+
+1. Prompt
+2. AI Image workflow
+3. Multiple angles
+4. 10-second Reel workflow
+5. Caption
+6. Instagram Preview
+7. Publishing`,
+    "success"
+  );
+
+  activateWorkflow(1);
+
+  await generateCampaignPlan();
+
+  setTimeout(()=>{
+    activateWorkflow(3);
+  },400);
+
+  setTimeout(()=>{
+    generateCaption();
+  },700);
+
+  setTimeout(()=>{
+    activateWorkflow(6);
+  },1100);
+
+  toast(
+    "Campaign workflow prepared."
+  );
+
+}
+
+
+/* =========================================================
+   START MARKETING
+========================================================= */
+
+function startMarketing(){
+
+  scrollToSection(
+    "campaign"
+  );
+
+  activateWorkflow(1);
+
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+function resetCampaign(){
+
+  $("fashionPrompt").value =
+`Elegant Korean Seoul fashion editorial, stylish young adult woman wearing a premium designer outfit, beautiful Seoul cafe background, soft natural daylight, realistic luxury fashion photography, full body, elegant Korean fashion aesthetic, Instagram editorial quality.`;
+
+  $("angleCount").value =
+    "6";
+
+  $("contentType").value =
+    "Photo + Reel Campaign";
+
+  $("fashionStyle").value =
+    "Korean Seoul Luxury";
+
+  $("caption").value = "";
+
+  $("hashtags").value = "";
+
+  $("imageCaption").value = "";
+
+  $("reelCaption").value = "";
+
+  $("imageUrl").value = "";
+
+  $("videoUrl").value = "";
+
+  $("campaignResult").className =
+    "result";
+
+  $("imageResult").className =
+    "result";
+
+  $("reelResult").className =
+    "result";
+
+  $("previewImage").style.display =
+    "none";
+
+  $("previewVideo").style.display =
+    "none";
+
+  $("previewPlaceholder").style.display =
+    "block";
+
+  $("previewCaption").textContent =
+    "Your caption will appear here.";
+
+  $("metricCampaign").textContent =
+    "Ready";
+
+  activateWorkflow(1);
+
+  toast(
+    "Campaign reset."
+  );
+
+}
+
+
+/* =========================================================
+   SCHEDULER / CALENDAR
+========================================================= */
+
+let schedules =
+  JSON.parse(
+    localStorage.getItem(
+      "seoul_schedules"
+    ) || "[]"
+  );
+
+
+function addSchedule(){
+
+  const date =
+    $("scheduleDate").value;
+
+  const time =
+    $("scheduleTime").value;
+
+  const type =
+    $("scheduleType").value;
+
+  if(!date || !time){
+
+    toast(
+      "Please select date and time."
+    );
+
+    return;
+
+  }
+
+  schedules.push({
+    date,
+    time,
+    type
+  });
+
+  localStorage.setItem(
+    "seoul_schedules",
+    JSON.stringify(schedules)
+  );
+
+  renderCalendar();
+
+  showResult(
+    "scheduleResult",
+`📅 Added to content calendar.
+
+Date: ${date}
+Time: ${time}
+Content: ${type}
+
+This creates a planning entry. Actual automatic future publishing requires a server-side scheduler.`,
+    "success"
+  );
+
+  toast(
+    "Added to calendar."
+  );
+
+}
+
+
+function renderCalendar(){
+
+  const calendar =
+    $("calendar");
+
+  if(!calendar) return;
+
+  calendar.innerHTML = "";
+
+  const today =
+    new Date();
+
+  for(let i=0;i<14;i++){
+
+    const d =
+      new Date(today);
+
+    d.setDate(
+      today.getDate()+i
+    );
+
+    const yyyy =
+      d.getFullYear();
+
+    const mm =
+      String(
+        d.getMonth()+1
+      ).padStart(2,"0");
+
+    const dd =
+      String(
+        d.getDate()
+      ).padStart(2,"0");
+
+    const key =
+      `${yyyy}-${mm}-${dd}`;
+
+    const day =
+      document.createElement(
+        "div"
+      );
+
+    day.className =
+      "day";
+
+    const dateText =
+      d.toLocaleDateString(
+        "en-IN",
+        {
+          weekday:"short",
+          day:"numeric",
+          month:"short"
+        }
+      );
+
+    day.innerHTML =
+      `<b>${dateText}</b>`;
+
+    const events =
+      schedules.filter(
+        item=>item.date===key
+      );
+
+    events.forEach(
+      event=>{
+
+        const div =
+          document.createElement(
+            "div"
+          );
+
+        div.className =
+          "event";
+
+        div.textContent =
+          `${event.time} • ${event.type}`;
+
+        day.appendChild(
+          div
+        );
+
+      }
+    );
+
+    calendar.appendChild(
+      day
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+let historyItems =
+  JSON.parse(
+    localStorage.getItem(
+      "seoul_campaign_history"
+    ) || "[]"
+  );
+
+
+function saveHistory(name){
+
+  historyItems.unshift({
+
+    name,
+
+    time:
+      new Date().toLocaleString(
+        "en-IN"
+      )
+
+  });
+
+  historyItems =
+    historyItems.slice(
+      0,
+      20
+    );
+
+  localStorage.setItem(
+    "seoul_campaign_history",
+    JSON.stringify(
+      historyItems
+    )
+  );
+
+  renderHistory();
+
+}
+
+
+function renderHistory(){
+
+  const box =
+    $("history");
+
+  if(!box) return;
+
+  box.innerHTML = "";
+
+  if(!historyItems.length){
+
+    box.innerHTML =
+      `<div class="muted">
+        No campaigns yet.
+      </div>`;
+
+    return;
+
+  }
+
+  historyItems.forEach(
+    item=>{
+
+      const row =
+        document.createElement(
+          "div"
+        );
+
+      row.className =
+        "history-item";
+
+      row.innerHTML =
+`<div>
+  <div class="history-name">
+    ${escapeHtml(item.name)}
+  </div>
+  <div class="history-time">
+    ${escapeHtml(item.time)}
+  </div>
+</div>
+<div>✓</div>`;
+
+      box.appendChild(
+        row
+      );
+
+    }
+  );
+
+}
+
+
+function clearHistory(){
+
+  historyItems = [];
+
+  localStorage.removeItem(
+    "seoul_campaign_history"
+  );
+
+  renderHistory();
+
+  toast(
+    "Campaign history cleared."
+  );
+
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHtml(value){
+
+  return String(value)
+    .replace(
+      /[&<>"']/g,
+      char=>({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#39;"
+      }[char])
+    );
+
+}
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
 
 window.addEventListener(
   "load",
   ()=>{
+
     checkInstagram();
+
+    renderCalendar();
+
+    renderHistory();
+
+    activateWorkflow(1);
 
     const params =
       new URLSearchParams(
@@ -1337,6 +3190,31 @@ window.addEventListener(
 
   }
 );
+
+
+/* =========================================================
+   AUTO UPDATE PREVIEW CAPTION
+========================================================= */
+
+$("imageCaption")
+  .addEventListener(
+    "input",
+    ()=>{
+      $("previewCaption").textContent =
+        $("imageCaption").value ||
+        "Your caption will appear here.";
+    }
+  );
+
+
+$("angleCount")
+  .addEventListener(
+    "change",
+    ()=>{
+      $("metricAngles").textContent =
+        $("angleCount").value;
+    }
+  );
 
 </script>
 
