@@ -8,19 +8,15 @@ const app = express();
 
 app.use(express.json({ limit: "20mb" }));
 
-// ===============================
-// FRONTEND
-// ===============================
+/* =========================
+   BASIC SERVER
+========================= */
 
 app.get("/", (req, res) => {
   res.sendFile(process.cwd() + "/index.html");
 });
 
 app.use(express.static(process.cwd()));
-
-// ===============================
-// SERVER CONFIG
-// ===============================
 
 const PORT = process.env.PORT || 3000;
 
@@ -38,16 +34,15 @@ const GRAPH_VERSION =
 const GRAPH_BASE =
   `https://graph.instagram.com/${GRAPH_VERSION}`;
 
-// ===============================
-// TEMPORARY SESSION STORAGE
-// ===============================
+
+/* =========================
+   SESSION STORAGE
+========================= */
 
 const sessions = new Map();
 const oauthStates = new Map();
 
-// ===============================
-// HELPERS
-// ===============================
+const SESSION_COOKIE = "ig_session";
 
 function requireEnv(name) {
   if (
@@ -70,49 +65,118 @@ function escapeHtml(value) {
   }[char]));
 }
 
-// ===============================
-// BASIC STATUS
-// ===============================
 
-app.get("/api/status", async (req, res) => {
-  const configured =
-    !!process.env.INSTAGRAM_ACCESS_TOKEN &&
-    !!process.env.INSTAGRAM_USER_ID;
+/* =========================
+   SESSION HELPERS
+========================= */
 
+function getSessionId(req) {
+  const cookieHeader = req.headers.cookie || "";
+
+  const cookies = {};
+
+  cookieHeader.split(";").forEach((part) => {
+    const index = part.indexOf("=");
+
+    if (index === -1) return;
+
+    const key = part.slice(0, index).trim();
+    const value = part.slice(index + 1).trim();
+
+    cookies[key] = decodeURIComponent(value);
+  });
+
+  return (
+    cookies[SESSION_COOKIE] ||
+    req.body?.sessionId ||
+    req.query?.sessionId ||
+    null
+  );
+}
+
+function getSession(req) {
+  const sessionId = getSessionId(req);
+
+  if (!sessionId) {
+    return null;
+  }
+
+  const session = sessions.get(sessionId);
+
+  if (!session) {
+    return null;
+  }
+
+  return {
+    id: sessionId,
+    ...session
+  };
+}
+
+function createSession(data) {
+  const sessionId =
+    crypto.randomBytes(32).toString("hex");
+
+  sessions.set(sessionId, {
+    ...data,
+    created_at: Date.now()
+  });
+
+  return sessionId;
+}
+
+function deleteSession(sessionId) {
+  if (sessionId) {
+    sessions.delete(sessionId);
+  }
+}
+
+
+/* =========================
+   HEALTH / STATUS
+========================= */
+
+app.get("/api/status", (req, res) => {
   res.json({
     ok: true,
-    instagram_configured: configured,
-    oauth_sessions: sessions.size,
-    graph_version: GRAPH_VERSION
+    instagram_sessions: sessions.size,
+    graph_version: GRAPH_VERSION,
+    redirect_uri: REDIRECT
   });
 });
 
-// ===============================
-// INSTAGRAM ACCOUNT STATUS
-// ===============================
+
+/* =========================
+   INSTAGRAM CONNECT STATUS
+========================= */
 
 app.get("/api/instagram/status", async (req, res) => {
   try {
-    requireEnv("INSTAGRAM_ACCESS_TOKEN");
-    requireEnv("INSTAGRAM_USER_ID");
+    const session = getSession(req);
 
-    const token =
-      process.env.INSTAGRAM_ACCESS_TOKEN;
-
-    const userId =
-      process.env.INSTAGRAM_USER_ID;
+    if (!session) {
+      return res.json({
+        ok: true,
+        connected: false,
+        message: "Instagram is not connected."
+      });
+    }
 
     const url =
-      `${GRAPH_BASE}/${userId}` +
+      `${GRAPH_BASE}/${session.user_id}` +
       `?fields=id,username` +
-      `&access_token=${encodeURIComponent(token)}`;
+      `&access_token=${encodeURIComponent(
+        session.access_token
+      )}`;
 
     const response = await fetch(url);
 
     const data = await response.json();
 
     if (!response.ok) {
-      return res.status(400).json({
+      deleteSession(session.id);
+
+      return res.status(401).json({
         ok: false,
         connected: false,
         error: data
@@ -134,16 +198,17 @@ app.get("/api/instagram/status", async (req, res) => {
   }
 });
 
-// ===============================
-// INSTAGRAM OAUTH START
-// ===============================
+
+/* =========================
+   INSTAGRAM OAUTH START
+========================= */
 
 app.get("/auth/instagram", (req, res) => {
   try {
     requireEnv("META_APP_ID");
 
     const state =
-      crypto.randomBytes(24).toString("hex");
+      crypto.randomBytes(32).toString("hex");
 
     oauthStates.set(state, Date.now());
 
@@ -184,15 +249,16 @@ app.get("/auth/instagram", (req, res) => {
 
   } catch (error) {
     res.status(500).send(`
-      <h2>Meta setup required</h2>
+      <h2>Instagram setup required</h2>
       <p>${escapeHtml(error.message)}</p>
     `);
   }
 });
 
-// ===============================
-// INSTAGRAM OAUTH CALLBACK
-// ===============================
+
+/* =========================
+   INSTAGRAM OAUTH CALLBACK
+========================= */
 
 app.get(
   "/auth/instagram/callback",
@@ -206,19 +272,17 @@ app.get(
     } = req.query;
 
     if (error) {
-      return res.status(400).send(
-        `Instagram authorization failed: ${
+      return res.status(400).send(`
+        <h2>Instagram authorization failed</h2>
+        <p>${escapeHtml(
           error_reason || error
-        }`
-      );
+        )}</p>
+      `);
     }
 
-    if (
-      !state ||
-      !oauthStates.has(state)
-    ) {
+    if (!state || !oauthStates.has(state)) {
       return res.status(400).send(
-        "Invalid OAuth state."
+        "Invalid or expired OAuth state."
       );
     }
 
@@ -234,81 +298,120 @@ app.get(
       requireEnv("META_APP_ID");
       requireEnv("META_APP_SECRET");
 
-      const body =
-        new URLSearchParams({
-          client_id:
-            process.env.META_APP_ID,
+      /*
+       IMPORTANT:
+       META_APP_ID must be the Instagram
+       App ID from Instagram API / Instagram Login.
+      */
 
-          client_secret:
-            process.env.META_APP_SECRET,
+      const body = new URLSearchParams({
+        client_id:
+          process.env.META_APP_ID,
 
-          grant_type:
-            "authorization_code",
+        client_secret:
+          process.env.META_APP_SECRET,
 
-          redirect_uri:
-            REDIRECT,
+        grant_type:
+          "authorization_code",
 
-          code
-        });
+        redirect_uri:
+          REDIRECT,
 
-      const response =
-        await fetch(
-          "https://api.instagram.com/oauth/access_token",
-          {
-            method: "POST",
+        code
+      });
 
-            headers: {
-              "Content-Type":
-                "application/x-www-form-urlencoded"
-            },
+      const response = await fetch(
+        "https://api.instagram.com/oauth/access_token",
+        {
+          method: "POST",
 
-            body
-          }
-        );
+          headers: {
+            "Content-Type":
+              "application/x-www-form-urlencoded"
+          },
 
-      const data =
-        await response.json();
+          body
+        }
+      );
+
+      const data = await response.json();
 
       if (
         !response.ok ||
-        !data.access_token
+        !data.access_token ||
+        !data.user_id
       ) {
         return res.status(400).send(`
           <h2>Instagram token exchange failed</h2>
+
+          <p>Check the following:</p>
+
+          <ul>
+            <li>Instagram App ID</li>
+            <li>Instagram App Secret</li>
+            <li>Redirect URI</li>
+            <li>Instagram authorization settings</li>
+          </ul>
+
           <pre>${escapeHtml(
             JSON.stringify(data, null, 2)
           )}</pre>
         `);
       }
 
-      const sessionId =
-        crypto.randomBytes(24).toString("hex");
-
-      sessions.set(sessionId, {
+      const sessionId = createSession({
         access_token:
           data.access_token,
 
         user_id:
-          data.user_id,
-
-        created_at:
-          Date.now()
+          data.user_id
       });
 
-      res.send(`
-        <script>
-          localStorage.setItem(
-            "ig_session",
-            "${sessionId}"
-          );
+      /*
+       Secure HttpOnly cookie.
+       The frontend does NOT see the access token.
+      */
 
-          location.href="/?connected=1";
-        </script>
+      res.setHeader(
+        "Set-Cookie",
+        `${SESSION_COOKIE}=${encodeURIComponent(
+          sessionId
+        )}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=2592000`
+      );
+
+      /*
+       Keep localStorage compatibility with
+       the existing index.html.
+      */
+
+      res.send(`
+        <!doctype html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Instagram Connected</title>
+        </head>
+
+        <body>
+          <script>
+            localStorage.setItem(
+              "ig_session",
+              ${JSON.stringify(sessionId)}
+            );
+
+            window.location.replace(
+              "/?connected=1"
+            );
+          </script>
+
+          <p>Instagram connected. Returning to dashboard...</p>
+        </body>
+        </html>
       `);
 
     } catch (error) {
       res.status(500).send(`
-        <h2>Connection error</h2>
+        <h2>Instagram connection error</h2>
         <pre>${escapeHtml(
           error.message
         )}</pre>
@@ -317,27 +420,33 @@ app.get(
   }
 );
 
-// ===============================
-// DISCONNECT
-// ===============================
+
+/* =========================
+   DISCONNECT INSTAGRAM
+========================= */
 
 app.post("/api/disconnect", (req, res) => {
 
   const sessionId =
-    req.body?.sessionId;
+    getSessionId(req);
 
-  if (sessionId) {
-    sessions.delete(sessionId);
-  }
+  deleteSession(sessionId);
+
+  res.setHeader(
+    "Set-Cookie",
+    `${SESSION_COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`
+  );
 
   res.json({
-    ok: true
+    ok: true,
+    connected: false
   });
 });
 
-// ===============================
-// CAMPAIGN PLAN
-// ===============================
+
+/* =========================
+   GENERATE CAMPAIGN PLAN
+========================= */
 
 app.post("/api/generate-plan", (req, res) => {
 
@@ -365,9 +474,10 @@ app.post("/api/generate-plan", (req, res) => {
   });
 });
 
-// ===============================
-// PUBLISH IMAGE TO INSTAGRAM
-// ===============================
+
+/* =========================
+   PUBLISH IMAGE
+========================= */
 
 app.post(
   "/api/publish-image",
@@ -375,13 +485,16 @@ app.post(
 
     try {
 
-      requireEnv(
-        "INSTAGRAM_ACCESS_TOKEN"
-      );
+      const session = getSession(req);
 
-      requireEnv(
-        "INSTAGRAM_USER_ID"
-      );
+      if (!session) {
+        return res.status(401).json({
+          ok: false,
+          connected: false,
+          error:
+            "Instagram is not connected."
+        });
+      }
 
       const {
         image_url,
@@ -396,18 +509,23 @@ app.post(
         });
       }
 
-      const token =
-        process.env.INSTAGRAM_ACCESS_TOKEN;
+      if (
+        !image_url.startsWith("https://")
+      ) {
+        return res.status(400).json({
+          ok: false,
+          error:
+            "Instagram requires a public HTTPS image URL."
+        });
+      }
 
-      const userId =
-        process.env.INSTAGRAM_USER_ID;
-
-      // ---------------------------
-      // CREATE MEDIA CONTAINER
-      // ---------------------------
+      /*
+       STEP 1:
+       Create Instagram media container
+      */
 
       const createUrl =
-        `${GRAPH_BASE}/${userId}/media`;
+        `${GRAPH_BASE}/${session.user_id}/media`;
 
       const createBody =
         new URLSearchParams();
@@ -424,7 +542,7 @@ app.post(
 
       createBody.set(
         "access_token",
-        token
+        session.access_token
       );
 
       const createResponse =
@@ -459,12 +577,13 @@ app.post(
       const containerId =
         createData.id;
 
-      // ---------------------------
-      // PUBLISH MEDIA
-      // ---------------------------
+      /*
+       STEP 2:
+       Publish container
+      */
 
       const publishUrl =
-        `${GRAPH_BASE}/${userId}/media_publish`;
+        `${GRAPH_BASE}/${session.user_id}/media_publish`;
 
       const publishBody =
         new URLSearchParams();
@@ -476,7 +595,7 @@ app.post(
 
       publishBody.set(
         "access_token",
-        token
+        session.access_token
       );
 
       const publishResponse =
@@ -533,9 +652,10 @@ app.post(
   }
 );
 
-// ===============================
-// CREATE INSTAGRAM REEL
-// ===============================
+
+/* =========================
+   REEL - CREATE CONTAINER
+========================= */
 
 app.post(
   "/api/publish-reel",
@@ -543,13 +663,16 @@ app.post(
 
     try {
 
-      requireEnv(
-        "INSTAGRAM_ACCESS_TOKEN"
-      );
+      const session = getSession(req);
 
-      requireEnv(
-        "INSTAGRAM_USER_ID"
-      );
+      if (!session) {
+        return res.status(401).json({
+          ok: false,
+          connected: false,
+          error:
+            "Instagram is not connected."
+        });
+      }
 
       const {
         video_url,
@@ -564,14 +687,23 @@ app.post(
         });
       }
 
-      const token =
-        process.env.INSTAGRAM_ACCESS_TOKEN;
+      if (
+        !video_url.startsWith("https://")
+      ) {
+        return res.status(400).json({
+          ok: false,
+          error:
+            "Instagram requires a public HTTPS video URL."
+        });
+      }
 
-      const userId =
-        process.env.INSTAGRAM_USER_ID;
+      /*
+       STEP 1:
+       Create Reel container
+      */
 
       const createUrl =
-        `${GRAPH_BASE}/${userId}/media`;
+        `${GRAPH_BASE}/${session.user_id}/media`;
 
       const body =
         new URLSearchParams();
@@ -593,7 +725,7 @@ app.post(
 
       body.set(
         "access_token",
-        token
+        session.access_token
       );
 
       const response =
@@ -625,17 +757,142 @@ app.post(
         });
       }
 
+      /*
+       STEP 2:
+       Wait for Instagram processing
+      */
+
+      const containerId =
+        data.id;
+
+      let statusData = null;
+
+      for (
+        let attempt = 0;
+        attempt < 12;
+        attempt++
+      ) {
+
+        await new Promise(
+          resolve =>
+            setTimeout(resolve, 5000)
+        );
+
+        const statusUrl =
+          `${GRAPH_BASE}/${containerId}` +
+          `?fields=status_code,status` +
+          `&access_token=${encodeURIComponent(
+            session.access_token
+          )}`;
+
+        const statusResponse =
+          await fetch(statusUrl);
+
+        statusData =
+          await statusResponse.json();
+
+        if (
+          statusData.status_code ===
+          "FINISHED"
+        ) {
+          break;
+        }
+
+        if (
+          statusData.status_code ===
+          "ERROR" ||
+          statusData.status_code ===
+          "EXPIRED"
+        ) {
+          return res.status(400).json({
+            ok: false,
+            step: "reel_processing",
+            container_id:
+              containerId,
+            status:
+              statusData
+          });
+        }
+      }
+
+      if (
+        !statusData ||
+        statusData.status_code !==
+        "FINISHED"
+      ) {
+        return res.status(202).json({
+          ok: true,
+          processing: true,
+          container_id:
+            containerId,
+          status:
+            statusData,
+          message:
+            "Instagram is still processing the Reel. Publish it after processing finishes."
+        });
+      }
+
+      /*
+       STEP 3:
+       Publish finished Reel
+      */
+
+      const publishUrl =
+        `${GRAPH_BASE}/${session.user_id}/media_publish`;
+
+      const publishBody =
+        new URLSearchParams();
+
+      publishBody.set(
+        "creation_id",
+        containerId
+      );
+
+      publishBody.set(
+        "access_token",
+        session.access_token
+      );
+
+      const publishResponse =
+        await fetch(
+          publishUrl,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/x-www-form-urlencoded"
+            },
+
+            body: publishBody
+          }
+        );
+
+      const publishData =
+        await publishResponse.json();
+
+      if (!publishResponse.ok) {
+        return res.status(400).json({
+          ok: false,
+          step: "publish_reel",
+          container_id:
+            containerId,
+          error:
+            publishData
+        });
+      }
+
       res.json({
         ok: true,
 
         message:
-          "Reel container created.",
+          "Instagram Reel published successfully.",
 
         container_id:
-          data.id,
+          containerId,
 
-        note:
-          "The Reel must finish processing before final publication."
+        media_id:
+          publishData.id
       });
 
     } catch (error) {
@@ -650,19 +907,18 @@ app.post(
   }
 );
 
-// ===============================
-// OLD PLACEHOLDER ENDPOINT
-// ===============================
+
+/* =========================
+   PLACEHOLDER PUBLISH
+========================= */
 
 app.post(
   "/api/publish-placeholder",
   async (req, res) => {
 
     if (req.body?.image_url) {
-
       return res.status(400).json({
         ok: false,
-
         message:
           "Use /api/publish-image for Instagram image publishing."
       });
@@ -670,16 +926,44 @@ app.post(
 
     res.status(400).json({
       ok: false,
-
       message:
-        "Instagram publishing requires a public image_url and caption."
+        "Instagram publishing requires a public HTTPS image_url and caption."
     });
   }
 );
 
-// ===============================
-// START SERVER
-// ===============================
+
+/* =========================
+   CLEAN OLD OAUTH STATES
+========================= */
+
+setInterval(() => {
+
+  const now = Date.now();
+
+  for (
+    const [state, createdAt]
+    of oauthStates.entries()
+  ) {
+
+    /*
+     OAuth state expires after 10 minutes.
+    */
+
+    if (
+      now - createdAt >
+      10 * 60 * 1000
+    ) {
+      oauthStates.delete(state);
+    }
+  }
+
+}, 60 * 1000);
+
+
+/* =========================
+   START SERVER
+========================= */
 
 app.listen(
   PORT,
@@ -687,6 +971,10 @@ app.listen(
   () => {
     console.log(
       `Seoul Instagram Automation running on port ${PORT}`
+    );
+
+    console.log(
+      `Instagram Redirect URI: ${REDIRECT}`
     );
   }
 );
